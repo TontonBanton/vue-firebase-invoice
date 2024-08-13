@@ -95,7 +95,7 @@ button, .button {
   background-color: #33d69f;
 }
 .orange {
-  background-color: #ff8f00;
+  background-color: #da881e;
 }
 
 // utility classes
