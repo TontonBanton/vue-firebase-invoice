@@ -21,7 +21,6 @@ header {
     border-radius: 0 20px 20px 0;
   }
   .branding {
-    border-radius: 0 20px 20px 0;
     background-color: black;
     justify-content: center;
     padding: 1px;

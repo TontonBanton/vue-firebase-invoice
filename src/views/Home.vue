@@ -1,30 +1,28 @@
-
 <script setup>
 import { ref } from 'vue'
+
 const filterMenu = ref(null)
-
-const newInvoice = ()=> {
-
-}
 
 const toggleFilterMenu = ()=> {
   filterMenu.value = !filterMenu.value
 }
+const newInvoice = ()=> {
 
+}
 </script>
 
 <template>
   <div class="home container">
     <div class="header flex">
 
-      <!--Right-->
+      <!--Left-->
       <div class="left flex flex-column">
         <h1>Invoices</h1>
         <span>4 invoices</span>
       </div>
-      <!--Left-->
+      <!--Right-->
       <div class="right flex">
-        <div class="filter flex" @click="toggleFilterMenu" >
+        <div @click="toggleFilterMenu" class="filter flex">
           <span>Filter by status</span>
           <img src="@/assets/arrow-down.png" alt="" />
           <ul v-show="filterMenu" class="filter-menu orange">
@@ -34,7 +32,7 @@ const toggleFilterMenu = ()=> {
             <li>Clear Filter</li>
           </ul>
         </div>
-        <div class="button flex orange" @click="newInvoice">
+        <div @click="newInvoice" class="button flex orange">
           <div class="inner-button flex"><img src="@/assets/plus-icon.png" alt="" /></div>
           <span>New Invoice</span>
         </div>
@@ -50,9 +48,7 @@ const toggleFilterMenu = ()=> {
 
   .header {
     margin-bottom: 65px;
-    .left,.right {
-      flex: 1;
-    }
+    .left,.right {flex: 1;}
 
     .right {
       justify-content: flex-end;
@@ -93,6 +89,7 @@ const toggleFilterMenu = ()=> {
 
       .button {
         padding: 8px 10px;
+        background-color: #d67d08;
         border-radius: 40px;
         .inner-button {
           margin-right: 8px;
