@@ -1,14 +1,16 @@
 <script setup>
 import { ref } from 'vue'
+import { useStore } from 'vuex'
+const store = useStore();
 
 const filterMenu = ref(null)
 
 const toggleFilterMenu = ()=> {
   filterMenu.value = !filterMenu.value
 }
-const newInvoice = ()=> {
-
-}
+const newInvoice = () => {
+  store.commit('TOGGLE_INVOICE');
+};
 </script>
 
 <template>

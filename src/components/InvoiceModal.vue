@@ -1,5 +1,8 @@
 <script setup>
 import { ref } from 'vue'
+import { useStore } from 'vuex'
+const store = useStore();
+
   const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
   const docId = ref(null);
   const loading = ref(null);
@@ -23,6 +26,11 @@ import { ref } from 'vue'
   const invoiceDraft = ref(null);
   const invoiceItemList = ref([]);
   const invoiceTotal = ref(0);
+
+  const closeInvoice = () => {
+    store.commit('TOGGLE_INVOICE');
+  };
+
 </script>
 
 <template>
@@ -32,7 +40,7 @@ import { ref } from 'vue'
     <h1>New Invoice</h1>
       <!-- Bill From -->
       <div class="bill-from flex flex-column">
-        <h4>Bill From</h4>
+        <h4 class>Bill From</h4>
         <div class="input flex flex-column">
           <label for="billerStreetAddress">Street Address</label>
           <input required type="text" id="billerStreetAddress" v-model="billerStreetAddress" />
@@ -98,7 +106,7 @@ import { ref } from 'vue'
         </div>
         <div class="input flex flex-column">
           <label for="paymentTerms">Payment Terms</label>
-          <select required type="text" id="paymentTerms" v-model="paymentTerms">
+          <select require id="paymentTerms" v-model="paymentTerms">
             <option value="30">Net 30 Days</option>
             <option value="60">Net 60 Days</option>
           </select>
@@ -108,7 +116,7 @@ import { ref } from 'vue'
           <input required type="text" id="productDescription" v-model="productDescription" />
         </div>
         <div class="work-items">
-          <h3>Item List</h3>
+          <h4>Item List</h4>
           <table class="item-list">
             <tr class="table-heading flex">
               <th class="item-name">Item Name</th>
@@ -176,7 +184,7 @@ import { ref } from 'vue'
       color: #777f98;
     }
     h4 {
-      color: #7c5dfa;
+      color: #da881e;
       font-size: 12px;
       margin-bottom: 24px;
     }

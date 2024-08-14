@@ -2,7 +2,7 @@
   <div v-if="!mobile" class="app flex flex-column">
     <Navigation/>
     <div class="app-content flex flex-column">
-      <InvoiceModal />
+      <InvoiceModal v-if="invoiceModal" />
       <router-view />
     </div>
   </div>
@@ -12,7 +12,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { useStore } from 'vuex';
 import Navigation from '@/components/Navigation.vue'
 import InvoiceModal from '@/components/InvoiceModal.vue';
 
@@ -26,14 +27,16 @@ const checkScreen = ()=> {
 onMounted(()=> {
   checkScreen()
   window.addEventListener("resize", checkScreen)
+  console.log('InvoiceModal state:', store.state.invoiceModal);
 })
 onUnmounted(() => {
   window.removeEventListener("resize", checkScreen)
 })
 
+// Initialize store and computed properties at the beginning
+const store = useStore();
+const invoiceModal = computed(() => store.state.invoiceModal);
 </script>
-
-
 
 <style lang="scss">
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
@@ -135,7 +138,6 @@ button, .button {
     margin-right: 8px;
   }
 }
-
 .paid {
   color: #33d69f;
   background-color: rgba(51, 214, 160, 0.1);
@@ -143,7 +145,6 @@ button, .button {
     background-color: #33d69f;
   }
 }
-
 .pending {
   color: #ff8f00;
   background-color: rgba(255, 145, 0, 0.1);
@@ -151,7 +152,6 @@ button, .button {
     background-color: #ff8f00;
   }
 }
-
 .draft {
   color: #dfe3fa;
   background-color: rgba(223, 227, 250, 0.1);
