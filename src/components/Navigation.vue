@@ -1,3 +1,6 @@
+<script setup>
+</script>
+
 <template>
   <header class="flex">
     <div class="branding flex">
@@ -5,9 +8,6 @@
     </div>
   </header>
 </template>
-
-<script setup>
-</script>
 
 <style lang="scss" scoped>
 header {
@@ -18,7 +18,6 @@ header {
     min-height: 100%;
     min-width: 90px;
     flex-direction: column;
-    border-radius: 0 20px 20px 0;
   }
   .branding {
     background-color: black;

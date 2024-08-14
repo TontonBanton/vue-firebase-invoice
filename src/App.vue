@@ -70,7 +70,7 @@ onUnmounted(() => {
   color: #fff;
 }
 
-// animated invoice
+/* Animation classes for Vue transitions */
 .invoice-enter-active, .invoice-leave-active {
   transition: 0.8s ease all;
 }

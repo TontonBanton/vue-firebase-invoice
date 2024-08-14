@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue'
+import { uid } from 'uid';
+import { ref, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore();
 
@@ -27,9 +28,37 @@ const store = useStore();
   const invoiceItemList = ref([]);
   const invoiceTotal = ref(0);
 
-  const closeInvoice = () => {
+  onMounted(()=> {
+    invoiceDateUnix.value = Date.now()
+    invoiceDate.value = new Date(invoiceDateUnix.value).toLocaleDateString("en-us", dateOptions.value);
+  })
+
+  const addNewInvoiceItem = ()=> {
+    invoiceItemList.value.push({
+      id: uid(),
+      itemName: "",
+      qty: "",
+      price: 0,
+      total: 0
+    })
+  }
+
+  const deleteInvoiceItem = (xid)=> {
+    console.log(xid)
+    invoiceItemList.value = invoiceItemList.value.filter(item => item.id !== xid )
+  }
+
+  const closeInvoice = ()=> {
     store.commit('TOGGLE_INVOICE');
   };
+
+  // Watcher for paymentTerms
+  watch(paymentTerms, (termsSelect) => {                                                                      //Watch change value in term option
+    const futureDate = new Date();                                                                            //Get the initial current date
+    paymentDueDateUnix.value = futureDate.setDate(futureDate.getDate() + parseInt(termsSelect));              //Get timestamp + terms
+    paymentDueDate.value = new Date(paymentDueDateUnix.value).toLocaleDateString("en-us", dateOptions.value); //Format
+    console.log(paymentDueDateUnix.value, paymentDueDate.value)
+  });
 
 </script>
 
@@ -129,11 +158,11 @@ const store = useStore();
               <td class="qty"><input type="text" v-model="item.qty" /></td>
               <td class="price"><input type="text" v-model="item.price" /></td>
               <td class="total flex">${{ (item.total = item.qty * item.price) }}</td>
-              <img @click="deleteInvoiceItem(item.id)" src="@/assets/plus-icon.png" alt="" />
+              <img @click="deleteInvoiceItem(item.id)" src="@/assets/x-icon.png" alt="" />
             </tr>
           </table>
-          <div @click="addNewInvoiceItem" class="flex button">
-            <img src="@/assets/plus-icon.png" alt="" style="width: 30px; height:30px"/>
+          <div @click="addNewInvoiceItem" class="flex button" style="color: orange">
+            <!-- <img src="@/assets/plus-icon.png" alt="" style="width: 30px; height:30px"/> -->
             Add New Item
           </div>
         </div>
@@ -177,11 +206,6 @@ const store = useStore();
     h1 {
       margin-bottom: 48px;
       color: #fff;
-    }
-    h3 {
-      margin-bottom: 16px;
-      font-size: 18px;
-      color: #777f98;
     }
     h4 {
       color: #da881e;
@@ -228,13 +252,13 @@ const store = useStore();
 
           .table-items {
             position: relative;
-            margin-bottom: 24px;
+            margin-bottom: 10px;
             img {
               position: absolute;
               top: 15px;
               right: 0;
-              width: 12px;
-              height: 16px;
+              width: 20px;
+              height: 20px;
             }
           }
         }
