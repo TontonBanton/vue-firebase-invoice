@@ -170,7 +170,7 @@ const store = useStore();
     padding: 56px;
     max-width: 700px;
     width: 100%;
-    background-color: #83807667;
+    background-color: #30291e;
     color: #fff;
     box-shadow: 10px 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 

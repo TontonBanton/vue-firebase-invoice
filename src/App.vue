@@ -2,7 +2,9 @@
   <div v-if="!mobile" class="app flex flex-column">
     <Navigation/>
     <div class="app-content flex flex-column">
-      <InvoiceModal v-if="invoiceModal" />
+      <transition name="invoice">
+        <InvoiceModal v-if="invoiceModal" />
+      </transition>
       <router-view />
     </div>
   </div>
@@ -16,6 +18,9 @@ import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useStore } from 'vuex';
 import Navigation from '@/components/Navigation.vue'
 import InvoiceModal from '@/components/InvoiceModal.vue';
+
+const store = useStore();
+const invoiceModal = computed(() => store.state.invoiceModal);
 
 const mobile = ref(null)
 
@@ -33,9 +38,6 @@ onUnmounted(() => {
   window.removeEventListener("resize", checkScreen)
 })
 
-// Initialize store and computed properties at the beginning
-const store = useStore();
-const invoiceModal = computed(() => store.state.invoiceModal);
 </script>
 
 <style lang="scss">
@@ -86,18 +88,6 @@ button, .button {
   color: #fff;
 }
 
-.dark-purple {
-  background-color: #252945;
-}
-.red {
-  background-color: #ec5757;
-}
-.purple {
-  background-color: #7c5dfa;
-}
-.green {
-  background-color: #33d69f;
-}
 .orange {
   background-color: #da881e;
 }
