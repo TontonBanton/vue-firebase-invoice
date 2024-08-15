@@ -2,6 +2,8 @@
 import { uid } from 'uid';
 import { ref, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
+import db from '@/firebase/firebaseinit'
+import { collection, doc, setDoc } from 'firebase/firestore'
 const store = useStore();
 
   const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
@@ -33,6 +35,14 @@ const store = useStore();
     invoiceDate.value = new Date(invoiceDateUnix.value).toLocaleDateString("en-us", dateOptions.value);
   })
 
+  // Watcher for paymentTerms
+  watch(paymentTerms, (termsSelect) => {                                                                      //Watch change value in term option
+    const futureDate = new Date();                                                                            //Get the initial current date
+    paymentDueDateUnix.value = futureDate.setDate(futureDate.getDate() + parseInt(termsSelect));              //Get timestamp + terms
+    paymentDueDate.value = new Date(paymentDueDateUnix.value).toLocaleDateString("en-us", dateOptions.value); //Format
+    console.log(paymentDueDateUnix.value, paymentDueDate.value)
+  });
+
   const addNewInvoiceItem = ()=> {
     invoiceItemList.value.push({
       id: uid(),
@@ -44,7 +54,6 @@ const store = useStore();
   }
 
   const deleteInvoiceItem = (xid)=> {
-    console.log(xid)
     invoiceItemList.value = invoiceItemList.value.filter(item => item.id !== xid )
   }
 
@@ -52,13 +61,96 @@ const store = useStore();
     store.commit('TOGGLE_INVOICE');
   };
 
-  // Watcher for paymentTerms
-  watch(paymentTerms, (termsSelect) => {                                                                      //Watch change value in term option
-    const futureDate = new Date();                                                                            //Get the initial current date
-    paymentDueDateUnix.value = futureDate.setDate(futureDate.getDate() + parseInt(termsSelect));              //Get timestamp + terms
-    paymentDueDate.value = new Date(paymentDueDateUnix.value).toLocaleDateString("en-us", dateOptions.value); //Format
-    console.log(paymentDueDateUnix.value, paymentDueDate.value)
-  });
+  const publishInvoice = ()=> {
+    invoicePending.value = true
+  }
+  const saveDraft = ()=> {
+    invoiceDraft.value = true
+  }
+
+  const submitForm = ()=> {
+    uploadInvoice()
+  }
+  const uploadInvoice = async () => {
+  if (invoiceItemList.value.length <= 0) {
+    alert('Please enter required data');
+    return;
+  }
+
+  calInvoiceTotal();
+
+  const invoicesCollectionRef = collection(db, 'invoices');   // Get a reference to the "invoices" collection
+  const newInvoiceRef = doc(invoicesCollectionRef);           // Create a new document in the "invoices" collection with a generated ID
+
+  try {
+    // Print data to be sent to Firestore for debugging
+    console.log('Data to be uploaded:', {
+      invoiceId: uid(6),
+      billerStreetAddress: billerStreetAddress.value,
+      billerCity: billerCity.value,
+      billerZipCode: billerZipCode.value,
+      billerCountry: billerCountry.value,
+      clientName: clientName.value,
+      clientEmail: clientEmail.value,
+      clientStreetAddress: clientStreetAddress.value,
+      clientCity: clientCity.value,
+      clientZipCode: clientZipCode.value,
+      clientCountry: clientCountry.value,
+      invoiceDate: invoiceDate.value,
+      invoiceDateUnix: invoiceDateUnix.value,
+      paymentTerms: paymentTerms.value,
+      paymentDueDate: paymentDueDate.value,
+      paymentDueDateUnix: paymentDueDateUnix.value,
+      productDescription: productDescription.value,
+      invoiceItemList: invoiceItemList.value,
+      invoiceTotal: invoiceTotal.value,
+      invoicePending: invoicePending.value,
+      invoiceDraft: invoiceDraft.value,
+      invoicePaid: null,
+    });
+
+    // Set data for the new document
+    await setDoc(newInvoiceRef, {
+      invoiceId: uid(6),
+      billerStreetAddress: billerStreetAddress.value,
+      billerCity: billerCity.value,
+      billerZipCode: billerZipCode.value,
+      billerCountry: billerCountry.value,
+      clientName: clientName.value,
+      clientEmail: clientEmail.value,
+      clientStreetAddress: clientStreetAddress.value,
+      clientCity: clientCity.value,
+      clientZipCode: clientZipCode.value,
+      clientCountry: clientCountry.value,
+      invoiceDate: invoiceDate.value,
+      invoiceDateUnix: invoiceDateUnix.value,
+      paymentTerms: paymentTerms.value,
+      paymentDueDate: paymentDueDate.value,
+      paymentDueDateUnix: paymentDueDateUnix.value,
+      productDescription: productDescription.value,
+      invoiceItemList: invoiceItemList.value,
+      invoiceTotal: invoiceTotal.value,
+      invoicePending: invoicePending.value,
+      invoiceDraft: invoiceDraft.value,
+      invoicePaid: null,
+    });
+
+    console.log('Invoice successfully uploaded!');
+  } catch (error) {
+    // Print detailed error information
+    console.error('Error uploading invoice: ', error.message || error);
+  }
+  // Call Vuex mutation
+  store.commit('TOGGLE_INVOICE');
+};
+
+  const calInvoiceTotal = ()=> {
+    invoiceTotal.value = 0
+    invoiceItemList.value.forEach((item) => {
+      invoiceTotal.value += item.total
+    })
+  }
+
 
 </script>
 
@@ -199,7 +291,7 @@ const store = useStore();
     padding: 56px;
     max-width: 700px;
     width: 100%;
-    background-color: #30291e;
+    background-color: #534f48;
     color: #fff;
     box-shadow: 10px 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
