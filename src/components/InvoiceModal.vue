@@ -1,4 +1,5 @@
 <script setup>
+import Loading from '@/components/Loading.vue'
 import { uid } from 'uid';
 import { ref, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
@@ -72,84 +73,55 @@ const store = useStore();
     uploadInvoice()
   }
   const uploadInvoice = async () => {
-  if (invoiceItemList.value.length <= 0) {
-    alert('Please enter required data');
-    return;
-  }
+    if (invoiceItemList.value.length <= 0) {
+      alert('Please enter required data');
+      return;
+    }
+    loading.value = true
+    calInvoiceTotal();
 
-  calInvoiceTotal();
-
-  const invoicesCollectionRef = collection(db, 'invoices');   // Get a reference to the "invoices" collection
-  const newInvoiceRef = doc(invoicesCollectionRef);           // Create a new document in the "invoices" collection with a generated ID
-
-  try {
-    // Print data to be sent to Firestore for debugging
-    console.log('Data to be uploaded:', {
-      invoiceId: uid(6),
-      billerStreetAddress: billerStreetAddress.value,
-      billerCity: billerCity.value,
-      billerZipCode: billerZipCode.value,
-      billerCountry: billerCountry.value,
-      clientName: clientName.value,
-      clientEmail: clientEmail.value,
-      clientStreetAddress: clientStreetAddress.value,
-      clientCity: clientCity.value,
-      clientZipCode: clientZipCode.value,
-      clientCountry: clientCountry.value,
-      invoiceDate: invoiceDate.value,
-      invoiceDateUnix: invoiceDateUnix.value,
-      paymentTerms: paymentTerms.value,
-      paymentDueDate: paymentDueDate.value,
-      paymentDueDateUnix: paymentDueDateUnix.value,
-      productDescription: productDescription.value,
-      invoiceItemList: invoiceItemList.value,
-      invoiceTotal: invoiceTotal.value,
-      invoicePending: invoicePending.value,
-      invoiceDraft: invoiceDraft.value,
-      invoicePaid: null,
-    });
-
-    // Set data for the new document
-    await setDoc(newInvoiceRef, {
-      invoiceId: uid(6),
-      billerStreetAddress: billerStreetAddress.value,
-      billerCity: billerCity.value,
-      billerZipCode: billerZipCode.value,
-      billerCountry: billerCountry.value,
-      clientName: clientName.value,
-      clientEmail: clientEmail.value,
-      clientStreetAddress: clientStreetAddress.value,
-      clientCity: clientCity.value,
-      clientZipCode: clientZipCode.value,
-      clientCountry: clientCountry.value,
-      invoiceDate: invoiceDate.value,
-      invoiceDateUnix: invoiceDateUnix.value,
-      paymentTerms: paymentTerms.value,
-      paymentDueDate: paymentDueDate.value,
-      paymentDueDateUnix: paymentDueDateUnix.value,
-      productDescription: productDescription.value,
-      invoiceItemList: invoiceItemList.value,
-      invoiceTotal: invoiceTotal.value,
-      invoicePending: invoicePending.value,
-      invoiceDraft: invoiceDraft.value,
-      invoicePaid: null,
-    });
-
-    console.log('Invoice successfully uploaded!');
-  } catch (error) {
-    // Print detailed error information
-    console.error('Error uploading invoice: ', error.message || error);
-  }
-  // Call Vuex mutation
+    //FIREBASE
+    const invoicesCollectionRef = collection(db, 'invoices');   // Get a reference to the "invoices" collection
+    const newInvoiceRef = doc(invoicesCollectionRef);           // Create a new document in the "invoices" collection with a generated ID
+    try {
+      await setDoc(newInvoiceRef, {
+        invoiceId: uid(6),
+        billerStreetAddress: billerStreetAddress.value,
+        billerCity: billerCity.value,
+        billerZipCode: billerZipCode.value,
+        billerCountry: billerCountry.value,
+        clientName: clientName.value,
+        clientEmail: clientEmail.value,
+        clientStreetAddress: clientStreetAddress.value,
+        clientCity: clientCity.value,
+        clientZipCode: clientZipCode.value,
+        clientCountry: clientCountry.value,
+        invoiceDate: invoiceDate.value,
+        invoiceDateUnix: invoiceDateUnix.value,
+        paymentTerms: paymentTerms.value,
+        paymentDueDate: paymentDueDate.value,
+        paymentDueDateUnix: paymentDueDateUnix.value,
+        productDescription: productDescription.value,
+        invoiceItemList: invoiceItemList.value,
+        invoiceTotal: invoiceTotal.value,
+        invoicePending: invoicePending.value,
+        invoiceDraft: invoiceDraft.value,
+        invoicePaid: null,
+      });
+      console.log('Invoice successfully uploaded!');
+    } catch (error) {
+      console.error('Error uploading invoice: ', error.message || error);
+    }
+  loading.value = false
   store.commit('TOGGLE_INVOICE');
 };
 
-  const calInvoiceTotal = ()=> {
-    invoiceTotal.value = 0
-    invoiceItemList.value.forEach((item) => {
-      invoiceTotal.value += item.total
-    })
-  }
+const calInvoiceTotal = ()=> {
+  invoiceTotal.value = 0
+  invoiceItemList.value.forEach((item) => {
+    invoiceTotal.value += item.total
+  })
+}
 
 
 </script>
@@ -158,6 +130,7 @@ const store = useStore();
 <div @click="checkClick" class="invoice-wrap flex flex-column" ref="invoiceWrap">
 
   <form @submit.prevent="submitForm" class="invoice-content">
+    <Loading v-show="loading"/>
     <h1>New Invoice</h1>
       <!-- Bill From -->
       <div class="bill-from flex flex-column">
