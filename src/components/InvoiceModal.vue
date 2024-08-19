@@ -2,9 +2,9 @@
 import Loading from '@/components/Loading.vue'
 import { uid } from 'uid';
 import { ref, onMounted, watch } from 'vue'
-import { useStore } from 'vuex'
 import db from '@/firebase/firebaseinit'
 import { collection, doc, setDoc } from 'firebase/firestore'
+import { useStore } from 'vuex'
 const store = useStore();
 
   const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
@@ -53,7 +53,6 @@ const store = useStore();
       total: 0
     })
   }
-
   const deleteInvoiceItem = (xid)=> {
     invoiceItemList.value = invoiceItemList.value.filter(item => item.id !== xid )
   }
@@ -61,14 +60,13 @@ const store = useStore();
   const closeInvoice = ()=> {
     store.commit('TOGGLE_INVOICE');
   };
-
-  const publishInvoice = ()=> {
-    invoicePending.value = true
-  }
   const saveDraft = ()=> {
     invoiceDraft.value = true
   }
-
+  const publishInvoice = ()=> {
+    invoicePending.value = true
+  }
+  //Saving data on submin
   const submitForm = ()=> {
     uploadInvoice()
   }
@@ -114,15 +112,21 @@ const store = useStore();
     }
   loading.value = false
   store.commit('TOGGLE_INVOICE');
-};
+  }
+  const calInvoiceTotal = ()=> {
+    invoiceTotal.value = 0
+    invoiceItemList.value.forEach((item) => {
+      invoiceTotal.value += item.total
+    })
+  }
 
-const calInvoiceTotal = ()=> {
-  invoiceTotal.value = 0
-  invoiceItemList.value.forEach((item) => {
-    invoiceTotal.value += item.total
-  })
-}
-
+  //For click on invoiceWrap main container
+  const invoiceWrap = ref(null)
+  const checkClick = (e)=> {
+    if (e.target === invoiceWrap.value) {
+      store.commit('TOGGLE_MODAL');
+    }
+  }
 
 </script>
 
