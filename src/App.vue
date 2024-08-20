@@ -27,12 +27,16 @@ const modalActive = computed(() => store.state.modalActive);
 
 const mobile = ref(null)
 
+const fetchInvoices = async () => {
+  await store.dispatch('GET_INVOICES');       //Execute vuex action
+};
 const checkScreen = ()=> {
   const windowWidth = window.innerWidth
   mobile.value = windowWidth <= 750 ? true : false;
 }
 
 onMounted(()=> {
+  fetchInvoices()
   checkScreen()
   window.addEventListener("resize", checkScreen)
   console.log('InvoiceModal state:', store.state.invoiceModal);
