@@ -1,10 +1,13 @@
 <script setup>
-import { ref } from 'vue'
-import { useStore } from 'vuex'
+import Invoice from '@/components/Invoice.vue'
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
 
 const store = useStore();
+const invoiceData= computed(() => store.state.invoiceData);
+
 const newInvoice = () => {
-  store.commit('TOGGLE_INVOICE');
+  store.commit('TOGGLE_INVOICE');    //Excecute store mutation
 };
 
 const filterMenu = ref(null)
@@ -16,12 +19,6 @@ const toggleFilterMenu = ()=> {
 <template>
   <div class="home container">
     <div class="header flex">
-
-      <!--Left-->
-      <div class="left flex flex-column">
-        <h1>Invoices</h1>
-        <span>4 invoices</span>
-      </div>
       <!--Right-->
       <div class="right flex">
         <div @click="toggleFilterMenu" class="filter flex">
@@ -40,7 +37,10 @@ const toggleFilterMenu = ()=> {
         </div>
       </div>
     </div>
-
+    <!--Loop Invoice Data-->
+    <div v-for="(invoice, index) in invoiceData" :key="index">
+      <Invoice :invoice="invoice"/>
+    </div>
   </div>
 </template>
 

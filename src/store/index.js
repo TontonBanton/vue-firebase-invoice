@@ -5,7 +5,7 @@ import { collection, getDocs } from 'firebase/firestore'; // Import from firesto
 export default createStore({
   state: {
     invoiceModal: null,
-    modal: null,
+    modalActive: null,
     invoiceData: [],
     invoicesLoaded: null
   },
@@ -57,7 +57,7 @@ export default createStore({
             };
             commit('SET_INVOICE_DATA', data)                                    //Execute setinvoicedata mutation
           }
-          commit('INVOICES_LOADED')                                             //Excecute mutation
+          commit('INVOICES_LOADED')                                             //Excecute mutation set loaded to true
         });
       } catch (error) {
         console.error('Error fetching invoices:', error);
