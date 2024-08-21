@@ -38,8 +38,14 @@ const toggleFilterMenu = ()=> {
       </div>
     </div>
     <!--Loop Invoice Data-->
-    <div v-for="(invoice, index) in invoiceData" :key="index">
-      <Invoice :invoice="invoice"/>
+    <div v-if="invoiceData.length > 0">
+      <Invoice v-for="(invoice, index) in invoiceData" :invoice="invoice" :key="index"/>
+    </div>
+    <!--No Invoice Data-->
+    <div v-else class="empty flex flex-column">
+      <img src="@/assets/no-data1.png" alt="">
+      <h3>No Invoices Data</h3>
+      <p>Click the New Invoice button above to create one</p>
     </div>
   </div>
 </template>
