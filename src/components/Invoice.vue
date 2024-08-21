@@ -23,7 +23,7 @@ const props = defineProps({
         <span v-if="invoice.invoicePending">Pending</span>
       </div>
       <div class="icon">
-        <img src="@/assets/right-arrow.png" alt="">
+        <img src="@/assets/right-arrow.png" alt="" style="width: 15px; height: 15px" />
       </div>
     </div>
   </router-link>
@@ -57,9 +57,6 @@ const props = defineProps({
       flex: 1;
       font-size: 16px;
       font-weight: 600px;
-    }
-    .icon {
-      img {width: 15px; height: 15px;}
     }
   }
 }
