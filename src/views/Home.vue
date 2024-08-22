@@ -1,6 +1,6 @@
 <script setup>
 import Invoice from '@/components/Invoice.vue'
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
@@ -14,6 +14,10 @@ const filterMenu = ref(null)
 const toggleFilterMenu = ()=> {
   filterMenu.value = !filterMenu.value
 }
+
+ onMounted(() => {
+   store.dispatch('GET_INVOICES');
+ });
 </script>
 
 <template>

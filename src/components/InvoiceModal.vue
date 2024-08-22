@@ -112,7 +112,10 @@ const store = useStore();
     }
   loading.value = false
   store.commit('TOGGLE_INVOICE');
+   // Fetch the updated list of invoices after uploading
+   store.dispatch('GET_INVOICES');
   }
+
   const calInvoiceTotal = ()=> {
     invoiceTotal.value = 0
     invoiceItemList.value.forEach((item) => {
