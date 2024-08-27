@@ -60,27 +60,21 @@ const toggleFilterMenu = ()=> {
 
   .header {
     margin-bottom: 65px;
-    .left,.right {flex: 1;}
+    .left,.right { flex: 1; }
 
     .right {
       justify-content: flex-end;
       align-items: center;
-
       .button,.filter {
         align-items: center;
-        span { font-size: 12px;}
+        span { font-size: 12px; }
       }
 
       .filter {
         position: relative;
         margin-right: 40px;
         cursor: pointer;
-        img {
-          margin-left: 12px;
-          width: 9px;
-          height: 5px;
-        }
-
+        img { margin-left: 12px; width: 9px; height: 5px; }
         .filter-menu {
           width: 120px;
           position: absolute;
@@ -91,10 +85,7 @@ const toggleFilterMenu = ()=> {
             cursor: pointer;
             font-size: 12px;
             padding: 10px 20px;
-            &:hover {
-              color: #1e2139;
-              background-color: #fff;
-            }
+            &:hover { color: #1e2139; background-color: #fff; }
           }
         }
       }
@@ -110,10 +101,7 @@ const toggleFilterMenu = ()=> {
           align-items: center;
           justify-content: center;
           background-color: #fff;
-          img {
-            width: 10px;
-            height: 10px;
-          }
+          img { width: 10px; height: 10px;}
         }
       }
     }
@@ -122,14 +110,8 @@ const toggleFilterMenu = ()=> {
   .empty {
     margin-top: 160px;
     align-items: center;
-    img {
-      width: 214px;
-      height: 200px;
-    }
-    h3 {
-      font-size: 20px;
-      margin-top: 40px;
-    }
+    img { width: 214px; height: 200px; }
+    h3 { font-size: 20px; margin-top: 40px;}
     p {
       text-align: center;
       max-width: 224px;

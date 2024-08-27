@@ -31,8 +31,8 @@ const props = defineProps({
 
 <style lang="scss" scoped>
 .invoice {
-  text-decoration: none;
   cursor: pointer;
+  text-decoration: none;
   gap: 16px;
   margin-bottom: 16px;
   color: #fff;
@@ -53,11 +53,7 @@ const props = defineProps({
     gap: 16px;
     flex-basis: 40%;
     align-items: center;
-    .price {
-      flex: 1;
-      font-size: 16px;
-      font-weight: 600px;
-    }
+    .price { flex: 1; font-size: 16px; font-weight: 600px; }
   }
 }
 </style>

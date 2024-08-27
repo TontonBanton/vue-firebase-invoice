@@ -23,13 +23,9 @@ header {
     background-color: black;
     justify-content: center;
     padding: 1px;
-    @media(min-width: 900px) {
-      width: 100%;
-    }
+    @media(min-width: 900px) { width: 100%; }
   }
-  img {
-    width: auto;
-    height: 80px;
-  }
+
+  img { width: auto; height: 80px; }
 }
 </style>

@@ -20,9 +20,7 @@
   justify-content: center;
   align-items: center;
   @keyframes spin {
-    to {
-      transform: rotateZ(360deg);
-    }
+    to { transform: rotateZ(360deg); }
   }
   span {
     display: block;

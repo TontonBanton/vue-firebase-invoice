@@ -43,7 +43,7 @@ const closeInvoice = ()=> {
     p { text-align: center;}
     .actions {
       margin-top: 24px;
-      button { flex: 1;}
+      button { flex: 1; }
     }
   }
 }

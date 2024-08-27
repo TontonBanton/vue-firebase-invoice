@@ -15,9 +15,21 @@ const getCurrentInvoice = ()=> {
   currentInvoice.value = currentInvoiceArray.value[0] || null;
 }
 
+const formatCurrency = (value) => {
+  // Convert the value to a number if it's a string (item.price)
+  const numericValue = typeof value === 'string' ? parseFloat(value) : value;
+  if (value !== null && value !== undefined) {
+    console.log('ok')
+    return numericValue.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+  return "0.00";
+};
+
 onMounted(()=> {
   getCurrentInvoice()
-  console.log(invoiceId.value)
   console.log(currentInvoice.value.length)
 })
 </script>
@@ -93,13 +105,13 @@ onMounted(()=> {
           <div v-for="(item, index) in currentInvoice.invoiceItemList" :key="index" class="item flex">
             <p>{{ item.itemName }}</p>
             <p>{{ item.qty }}</p>
-            <p>{{ item.price }}</p>
-            <p>{{ item.total }}</p>
+            <p>{{ formatCurrency(item.price) }}</p>
+            <p>{{ formatCurrency(item.total) }}</p>
           </div>
         </div>
-        <div class="total flex">
+        <div class="total flex orange">
           <p>Amount Due</p>
-          <p>{{ currentInvoice.invoiceTotal }}</p>
+          <p>{{ formatCurrency(currentInvoice.invoiceTotal) }}</p>
         </div>
       </div>
     </div>
@@ -113,11 +125,7 @@ onMounted(()=> {
     align-items: center;
     color: #fff;
     font-size: 12px;
-    img {
-      margin-right: 16px;
-      width: 7px;
-      height: 10px;
-    }
+    img { margin-right: 16px; width: 7px; height: 10px; }
   }
   .header, .invoice-details {
     background-color: #21232e;
@@ -129,10 +137,7 @@ onMounted(()=> {
     font-size: 12px;
     .left {
       align-items: center;
-      span {
-        color: #dfe3fa;
-        margin-right: 16px;
-      }
+      span { color: #dfe3fa; margin-right: 16px;}
     }
     .right {
       flex: 1;
@@ -145,137 +150,67 @@ onMounted(()=> {
     padding: 48px;
     margin-top: 24px;
     .top {
-      div {
-        color: #dfe3fa;
-        flex: 1;
-      }
+      div { flex: 1; color: #dfe3fa; }
       .left {
         font-size: 12px;
-        p:first-child {
-          font-size: 24px;
-          text-transform: uppercase;
-          color: #fff;
-          margin-bottom: 8px;
-        }
+        p:first-child { font-size: 24px; text-transform: uppercase; color: #fff; margin-bottom: 8px;}
         p:nth-child(2) { font-size: 16px; }
         span { color: #888eb0; }
       }
-
-      .right {
-        font-size: 12px;
-        align-items: flex-end;
-      }
+      .right { font-size: 12px; align-items: flex-end; }
     }
 
     .middle {
       margin-top: 50px;
       color: #dfe3fa;
       gap: 16px;
-
-      h4 {
-        font-size: 12px;
-        font-weight: 400;
-        margin-bottom: 12px;
-      }
-
-      p {
-        font-size: 16px;
-      }
-
-      .bill,
-      .payment {
-        flex: 1;
-      }
+      h4 { font-size: 12px; font-weight: 800; margin-bottom: 12px; }
+      p { font-size: 16px; }
+      .bill, .payment { flex: 1; }
 
       .payment {
-        h4:nth-child(3) {
-          margin-top: 32px;
-        }
-
-        p {
-          font-weight: 600;
-        }
+        h4:nth-child(3) { margin-top: 32px; }
+        p { font-weight: 600; }
       }
 
       .bill {
-        p:nth-child(2) {
-          font-size: 16px;
-        }
-        p:nth-child(3) {
-          margin-top: auto;
-        }
-
-        p {
-          font-size: 12px;
-        }
+        p:nth-child(2) { font-size: 16px; }
+        p:nth-child(3) { margin-top: auto;}
+        p { font-size: 12px; }
       }
-
-      .send-to {
-        flex: 2;
-      }
+      .send-to { flex: 2; }
     }
 
     .bottom {
       margin-top: 50px;
-
       .billing-items {
         padding: 32px;
         border-radius: 20px 20px 0 0;
-        background-color: #252945;
-
+        background-color: #2b2c36;
         .heading {
           color: #dfe3fa;
           font-size: 12px;
           margin-bottom: 32px;
-
-          p:first-child {
-            flex: 3;
-            text-align: left;
-          }
-
-          p {
-            flex: 1;
-            text-align: right;
-          }
+          p:first-child { flex: 3; text-align: left; }
+          p { flex: 1; text-align: right;}
         }
-
         .item {
           margin-bottom: 32px;
           font-size: 13px;
           color: #fff;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-
-          p:first-child {
-            flex: 3;
-            text-align: left;
-          }
-
-          p {
-            flex: 1;
-            text-align: right;
-          }
+          &:last-child { margin-bottom: 0; }
+          p:first-child { flex: 3; text-align: left;}
+          p { flex: 1; text-align: right; }
         }
       }
 
       .total {
         color: #fff;
-        padding: 32px;
-        background-color: rgba(12, 14, 22, 0.7);
+        padding: 15px;
         align-items: center;
         border-radius: 0 0 20px 20px;
-
-        p {
-          flex: 1;
-          font-size: 12px;
-        }
-
-        p:nth-child(2) {
-          font-size: 28px;
-          text-align: right;
-        }
+        p { flex: 1; font-size: 12px;}
+        p:nth-child(2) { font-size: 28px; text-align: right;}
       }
     }
   }

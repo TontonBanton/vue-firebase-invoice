@@ -275,17 +275,9 @@ const store = useStore();
     color: #fff;
     box-shadow: 10px 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
-    h1 {
-      margin-bottom: 48px;
-      color: #fff;
-    }
-    h4 {
-      color: #da881e;
-      font-size: 12px;
-      margin-bottom: 24px;
-    }
+    h1 { margin-bottom: 48px; color: #fff; }
+    h4 { color: #da881e; font-size: 12px; margin-bottom: 24px; }
 
-    // Bill To / Bill From
     .bill-to, .bill-from {
       margin-bottom: 48px;
       .location-details {
@@ -294,7 +286,6 @@ const store = useStore();
       }
     }
 
-    // Invoice Work
     .invoice-work {
       .payment {
         gap: 24px;
@@ -311,27 +302,16 @@ const store = useStore();
             .item-name { flex-basis: 50%; }
             .qty   { flex-basis: 10%; }
             .price { flex-basis: 20%; }
-            .total {
-              flex-basis: 20%;
-              align-self: center;
-            }
+            .total { flex-basis: 20%; align-self: center;}
           }
-
           .table-heading {
             margin-bottom: 16px;
             th { text-align: left; }
           }
-
           .table-items {
             position: relative;
             margin-bottom: 10px;
-            img {
-              position: absolute;
-              top: 15px;
-              right: 0;
-              width: 20px;
-              height: 20px;
-            }
+            img { position: absolute; top: 15px; right: 0; width: 20px; height: 20px; }
           }
         }
 
@@ -348,7 +328,6 @@ const store = useStore();
 
     .save {
       margin-top: 60px;
-
       div { flex: 1; }
       .right { justify-content: flex-end; }
     }
@@ -356,10 +335,7 @@ const store = useStore();
 
   .input { margin-bottom: 24px; }
 
-  label {
-    font-size: 12px;
-    margin-bottom: 6px;
-  }
+  label { font-size: 12px; margin-bottom: 6px; }
 
   input, select {
     width: 100%;
