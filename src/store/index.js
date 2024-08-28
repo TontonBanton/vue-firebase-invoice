@@ -4,40 +4,47 @@ import { collection, getDocs } from 'firebase/firestore'; // Import from firesto
 
 export default createStore({
   state: {
+    invoicesLoaded: null,
     invoiceModal: null,
     modalActive: null,
+    editInvoice: null,
+
     invoiceData: [],
-    invoicesLoaded: null,
-    currentInvoiceArray: []
+    currentInvoiceArray: [],
   },
   mutations: {
+    INVOICES_LOADED(state){
+      state.invoicesLoaded = true
+    },
     TOGGLE_INVOICE(state) {
       state.invoiceModal = !state.invoiceModal;
     },
     TOGGLE_MODAL(state) {
       state.modalActive = !state.modalActive;
     },
+    TOGGLE_EDIT_INVOICE(state) {
+      state.editInvoice = !state.editInvoice;
+    },
     SET_INVOICE_DATA(state, data){
       state.invoiceData.push(data)
-      //console.log(state.invoiceData)
+      console.log(state.invoiceData)
     },
-    INVOICES_LOADED(state){
-      state.invoicesLoaded = true
+    SET_CURRENT_INVOICE(state, invoiceId){
+      state.currentInvoiceArray = state.invoiceData.filter(invoice => invoice.invoiceId === invoiceId)    //Create new currentInvoicearray with the dataId
     },
-    SET_CURRENT_INVOICE(state, dataId){
-      state.currentInvoiceArray = state.invoiceData.filter((invoice)=>{
-        return invoice.invoiceId === dataId
-      })
-      console.log(state.currentInvoiceArray)
-    }
+    DELETE_INVOICE(state, invoiceId){
+      state.currentInvoiceArray = state.invoiceData.filter(invoice => invoice.invoiceId !== invoiceId);   //Create new currentInvoicearray excluding dataId
+    },
   },
+
   actions: {
     async GET_INVOICES({commit, state}){
       try {
         const querySnapshot = await getDocs(collection(db, 'invoices'));        //Get invoices from firestore
         querySnapshot.forEach((doc) => {
-          if (!state.invoiceData.some(invoice => invoice.docId === doc.id)) {   //Check if docid already exist
-            const data = {                                                      //Save InvoiceDatas in data object
+
+          if (!state.invoiceData.some(invoice => invoice.docId === doc.id)) {   //Check if docid does not exist in invoice data
+            const data = {                                                      //Save InvoiceDatas in data object if no match on id
               docId: doc.id,
               invoiceId: doc.data().invoiceId,
               billerStreetAddress: doc.data().billerStreetAddress,
@@ -62,14 +69,22 @@ export default createStore({
               invoiceDraft: doc.data().invoiceDraft,
               invoicePaid: doc.data().invoicePaid,
             };
-            commit('SET_INVOICE_DATA', data)                                    //Execute setinvoicedata mutation
+            commit('SET_INVOICE_DATA', data)                                    //Execute setinvoicedata mutation passing the data
           }
           commit('INVOICES_LOADED')                                             //Excecute mutation set loaded to true
         });
       } catch (error) {
         console.error('Error fetching invoices:', error);
       }
+    },
+    async UPDATE_INVOICE({commit, dispatch}, {docId, routeId}) {
+      commit('DELETE_INVOICE', docId)             //Delete invoice w/ the id
+      await dispatch('GET_INVOICES')              //Get the invoice array exclueding the id
+      commit('TOGGLE_INVOICE')
+      commit('TOGGLE_EDIT_INVOICE')
+      commit('SET_CURRENT_INVOICE', routeId)
     }
   },
+
   modules: {}
 });

@@ -15,9 +15,6 @@ const toggleFilterMenu = ()=> {
   filterMenu.value = !filterMenu.value
 }
 
- onMounted(() => {
-   store.dispatch('GET_INVOICES');
- });
 </script>
 
 <template>
@@ -41,7 +38,7 @@ const toggleFilterMenu = ()=> {
         </div>
       </div>
     </div>
-    <!--Loop Invoice Data-->
+    <!--Loop invoiceData Load and Invoice Component-->
     <div v-if="invoiceData.length > 0">
       <Invoice v-for="(invoice, index) in invoiceData" :invoice="invoice" :key="index"/>
     </div>

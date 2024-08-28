@@ -6,8 +6,12 @@ const closeModal = ()=> {
   store.commit('TOGGLE_MODAL');
 }
 const closeInvoice = ()=> {
+  //Change states mutation
   store.commit('TOGGLE_INVOICE');
   store.commit('TOGGLE_MODAL');
+  if (store.state.editInvoice === true ) {
+    store.commit('TOGGLE_EDIT_INVOICE')
+  }
 }
 </script>
 

@@ -1,13 +1,19 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
+const route = useRoute()
+const store = useStore();
 
 const invoiceId = ref(null)
 const currentInvoice = ref([]); // Define currentInvoice as a ref
-const route = useRoute()
-const store = useStore();
 const currentInvoiceArray= computed(() => store.state.currentInvoiceArray);
+const editInvoice = computed(() => store.state.editInvoice);
+
+const toggleEditInvoice = ()=> {
+  store.commit('TOGGLE_EDIT_INVOICE');
+  store.commit('TOGGLE_INVOICE');
+}
 
 const getCurrentInvoice = ()=> {
   invoiceId.value = route.params.invoiceId
@@ -19,7 +25,6 @@ const formatCurrency = (value) => {
   // Convert the value to a number if it's a string (item.price)
   const numericValue = typeof value === 'string' ? parseFloat(value) : value;
   if (value !== null && value !== undefined) {
-    console.log('ok')
     return numericValue.toLocaleString(undefined, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -30,8 +35,18 @@ const formatCurrency = (value) => {
 
 onMounted(()=> {
   getCurrentInvoice()
-  console.log(currentInvoice.value.length)
 })
+watch(editInvoice, (newVal) => {
+  if (!newVal) {
+    // If editInvoice is false, set currentInvoice to the first item in currentInvoiceArray
+    currentInvoice.value = currentInvoiceArray.value[0];
+  } else {
+    // Handle the case where editInvoice is true or any other value
+    // For example, clear the currentInvoice or perform other actions
+    currentInvoice.value = null; // Example action, modify as needed
+  }
+});
+
 </script>
 
 <template>
@@ -52,7 +67,7 @@ onMounted(()=> {
         </div>
       </div>
       <div class="right flex">
-        <button @click="editInvoice(currentInvoice.docId)" class="orange">Edit</button>
+        <button @click="toggleEditInvoice" class="orange">Edit</button>
         <button @click="deleteInvoice(currentInvoice.docId)" class="orange">Delete</button>
         <button v-if="currentInvoice.invoicePending" @click="updateStatusPaid(currentInvoice.docId)" class="orange">Mark as Paid</button>
         <button v-if="currentInvoice.invoiceDraft || currentInvoice.invoicePaid" @click="updateStatusPending(currentInvoice.docId)" class="orange">Mark as Pending</button>

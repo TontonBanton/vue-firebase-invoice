@@ -1,11 +1,17 @@
 <script setup>
 import Loading from '@/components/Loading.vue'
-import { uid } from 'uid';
-import { ref, onMounted, watch } from 'vue'
+import { collection, doc, setDoc, updateDoc } from 'firebase/firestore'
 import db from '@/firebase/firebaseinit'
-import { collection, doc, setDoc } from 'firebase/firestore'
-import { useStore } from 'vuex'
+import { ref, computed ,onMounted, watch } from 'vue'
+import { uid } from 'uid';
+
+import { useRoute } from 'vue-router';
+import { useStore } from 'vuex';
+const route = useRoute()
 const store = useStore();
+
+const editInvoice = computed(() => store.state.editInvoice);
+const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
 
   const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
   const docId = ref(null);
@@ -31,12 +37,38 @@ const store = useStore();
   const invoiceItemList = ref([]);
   const invoiceTotal = ref(0);
 
-  onMounted(()=> {
-    invoiceDateUnix.value = Date.now()
-    invoiceDate.value = new Date(invoiceDateUnix.value).toLocaleDateString("en-us", dateOptions.value);
-  })
+  onMounted(() => {
+  //For New Invoice
+  if (!editInvoice.value) {
+    invoiceDateUnix.value = Date.now();
+    invoiceDate.value = new Date(invoiceDateUnix.value).toLocaleDateString('en-us', dateOptions.value);
+  //For Edit Invoice
+  } else {
+    const currentInvoice = currentInvoiceArray.value[0];
+    docId.value = currentInvoice.docId;
+    billerStreetAddress.value = currentInvoice.billerStreetAddress;
+    billerCity.value = currentInvoice.billerCity;
+    billerZipCode.value = currentInvoice.billerZipCode;
+    billerCountry.value = currentInvoice.billerCountry;
+    clientName.value = currentInvoice.clientName;
+    clientEmail.value = currentInvoice.clientEmail;
+    clientStreetAddress.value = currentInvoice.clientStreetAddress;
+    clientCity.value = currentInvoice.clientCity;
+    clientZipCode.value = currentInvoice.clientZipCode;
+    clientCountry.value = currentInvoice.clientCountry;
+    invoiceDateUnix.value = currentInvoice.invoiceDateUnix;
+    invoiceDate.value = currentInvoice.invoiceDate;
+    paymentTerms.value = currentInvoice.paymentTerms;
+    paymentDueDateUnix.value = currentInvoice.paymentDueDateUnix;
+    paymentDueDate.value = currentInvoice.paymentDueDate;
+    productDescription.value = currentInvoice.productDescription;
+    invoicePending.value = currentInvoice.invoicePending;
+    invoiceDraft.value = currentInvoice.invoiceDraft;
+    invoiceItemList.value = currentInvoice.invoiceItemList;
+    invoiceTotal.value = currentInvoice.invoiceTotal;
+  }
+  });
 
-  // Watcher for paymentTerms
   watch(paymentTerms, (termsSelect) => {                                                                      //Watch change value in term option
     const futureDate = new Date();                                                                            //Get the initial current date
     paymentDueDateUnix.value = futureDate.setDate(futureDate.getDate() + parseInt(termsSelect));              //Get timestamp + terms
@@ -45,31 +77,26 @@ const store = useStore();
   });
 
   const addNewInvoiceItem = ()=> {
-    invoiceItemList.value.push({
-      id: uid(),
-      itemName: "",
-      qty: "",
-      price: 0,
-      total: 0
-    })
+    invoiceItemList.value.push({ id: uid(), itemName: "", qty: "", price: 0, total: 0 })
   }
   const deleteInvoiceItem = (xid)=> {
     invoiceItemList.value = invoiceItemList.value.filter(item => item.id !== xid )
   }
+  const calInvoiceTotal = ()=> {
+    invoiceTotal.value = 0
+    invoiceItemList.value.forEach((item) => {
+      invoiceTotal.value += item.total
+    })
+  }
 
-  const closeInvoice = ()=> {
-    store.commit('TOGGLE_INVOICE');
-  };
-  const saveDraft = ()=> {
-    invoiceDraft.value = true
-  }
-  const publishInvoice = ()=> {
-    invoicePending.value = true
-  }
-  //Saving data on submin
+  //Saving data on submit
   const submitForm = ()=> {
+    if (editInvoice){
+      updateInvoice()
+    }
     uploadInvoice()
   }
+
   const uploadInvoice = async () => {
     if (invoiceItemList.value.length <= 0) {
       alert('Please enter required data');
@@ -78,7 +105,7 @@ const store = useStore();
     loading.value = true
     calInvoiceTotal();
 
-    //FIREBASE
+    //FIREBASE ADD
     const invoicesCollectionRef = collection(db, 'invoices');   // Get a reference to the "invoices" collection
     const newInvoiceRef = doc(invoicesCollectionRef);           // Create a new document in the "invoices" collection with a generated ID
     try {
@@ -110,20 +137,54 @@ const store = useStore();
     } catch (error) {
       console.error('Error uploading invoice: ', error.message || error);
     }
-  loading.value = false
-  store.commit('TOGGLE_INVOICE');
-   // Fetch the updated list of invoices after uploading
-   store.dispatch('GET_INVOICES');
+    loading.value = false
+    store.commit('TOGGLE_INVOICE');
+    store.dispatch('GET_INVOICES');  //Fetch the updated list of invoices after uploading
   }
 
-  const calInvoiceTotal = ()=> {
-    invoiceTotal.value = 0
-    invoiceItemList.value.forEach((item) => {
-      invoiceTotal.value += item.total
-    })
+  const updateInvoice = async () => {
+    if (invoiceItemList.value.length <= 0) {
+      alert('Please enter required data');
+      return;
+    }
+    loading.value = true
+    calInvoiceTotal();
+
+    //FIREBASE UPDATE
+    const invoiceRef = doc(db, 'invoices', docId.value);    // Get a reference to the document to update
+    try {
+      await updateDoc(invoiceRef, {
+        billerStreetAddress: billerStreetAddress.value,
+        billerCity: billerCity.value,
+        billerZipCode: billerZipCode.value,
+        billerCountry: billerCountry.value,
+        clientName: clientName.value,
+        clientEmail: clientEmail.value,
+        clientStreetAddress: clientStreetAddress.value,
+        clientCity: clientCity.value,
+        clientZipCode: clientZipCode.value,
+        clientCountry: clientCountry.value,
+        paymentTerms: paymentTerms.value,
+        paymentDueDate: paymentDueDate.value,
+        paymentDueDateUnix: paymentDueDateUnix.value,
+        productDescription: productDescription.value,
+        invoiceItemList: invoiceItemList.value,
+        invoiceTotal: invoiceTotal.value,
+    });
+    const data = {
+      docId: docId.value,
+      routeId: route.params.invoiceId
+    }
+    store.dispatch('UPDATE_INVOICES', data);        //Execute Vuex Action passing docId and routeId
+    console.log('Invoice successfully updated!');
+    } catch (error) {
+      console.error('Error uploading invoice: ', error.message || error);
+    }
+    loading.value = false
   }
 
-  //For click on invoiceWrap main container
+
+  //For click on invoiceWrap main container show modal
   const invoiceWrap = ref(null)
   const checkClick = (e)=> {
     if (e.target === invoiceWrap.value) {
@@ -131,6 +192,15 @@ const store = useStore();
     }
   }
 
+  const saveDraft = ()=> invoiceDraft.value = true
+  const publishInvoice = ()=>  invoicePending.value = true
+
+  const closeInvoice = ()=> {
+    store.commit('TOGGLE_INVOICE');
+    if (store.state.editInvoice === true ) {
+      store.commit('TOGGLE_EDIT_INVOICE')
+    }
+  };
 </script>
 
 <template>
@@ -138,7 +208,9 @@ const store = useStore();
 
   <form @submit.prevent="submitForm" class="invoice-content">
     <Loading v-show="loading"/>
-    <h1>New Invoice</h1>
+    <h1 v-if="!store.state.editInvoice">New Invoice</h1>
+    <h1 v-else>Edit Invoice</h1>
+
       <!-- Bill From -->
       <div class="bill-from flex flex-column">
         <h4 class>Bill From</h4>
@@ -246,8 +318,10 @@ const store = useStore();
           <button type="button" @click="closeInvoice" class="orange">Cancel</button>
         </div>
         <div class="right flex">
-          <button @click="saveDraft" class="orange">Save Draft</button>
-          <button @click="publishInvoice" class="orange">Create Invoice</button>
+          <button v-if="!store.state.editInvoice" type="submit" @click="saveDraft" class="orange">Save Draft</button>
+          <button v-if="!store.state.editInvoice" type="submit" @click="publishInvoice" class="orange">Create Invoice</button>
+
+          <button v-if="store.state.editInvoice" type="submit" class="orange">Update Invoice</button>
         </div>
       </div>
 
