@@ -5,10 +5,13 @@ import { useStore } from 'vuex';
 const route = useRoute()
 const store = useStore();
 
+import db from '@/firebase/firebaseinit';
+import { doc, getDoc } from 'firebase/firestore';
+
 const invoiceId = ref(null)
-const currentInvoice = ref([]); // Define currentInvoice as a ref
+const currentInvoice = ref(null); // Define currentInvoice as a ref
 const currentInvoiceArray= computed(() => store.state.currentInvoiceArray);
-const editInvoice = computed(() => store.state.editInvoice);
+//const editInvoice = computed(() => store.state.editInvoice);
 
 const toggleEditInvoice = ()=> {
   store.commit('TOGGLE_EDIT_INVOICE');
@@ -36,21 +39,11 @@ const formatCurrency = (value) => {
 onMounted(()=> {
   getCurrentInvoice()
 })
-watch(editInvoice, (newVal) => {
-  if (!newVal) {
-    // If editInvoice is false, set currentInvoice to the first item in currentInvoiceArray
-    currentInvoice.value = currentInvoiceArray.value[0];
-  } else {
-    // Handle the case where editInvoice is true or any other value
-    // For example, clear the currentInvoice or perform other actions
-    currentInvoice.value = null; // Example action, modify as needed
-  }
-});
 
 </script>
 
 <template>
-  <!-- {{  currentInvoice }} -->
+  {{  currentInvoice }}
   <div v-if="currentInvoice" class="invoice-view container">
     <router-link to="/" style="color:white;">
       <img src="@/assets/left-arrow.png" alt="" style="width: 15px; height: 15px" /> Back to List

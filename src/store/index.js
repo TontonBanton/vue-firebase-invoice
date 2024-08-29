@@ -27,10 +27,10 @@ export default createStore({
     },
     SET_INVOICE_DATA(state, data){
       state.invoiceData.push(data)
-      console.log(state.invoiceData)
     },
     SET_CURRENT_INVOICE(state, invoiceId){
       state.currentInvoiceArray = state.invoiceData.filter(invoice => invoice.invoiceId === invoiceId)    //Create new currentInvoicearray with the dataId
+      //alert('vuex Store setcurrent'+ JSON.stringify(state.currentInvoiceArray, null, 2));
     },
     DELETE_INVOICE(state, invoiceId){
       state.currentInvoiceArray = state.invoiceData.filter(invoice => invoice.invoiceId !== invoiceId);   //Create new currentInvoicearray excluding dataId
@@ -77,13 +77,13 @@ export default createStore({
         console.error('Error fetching invoices:', error);
       }
     },
-    async UPDATE_INVOICE({commit, dispatch}, {docId, routeId}) {
-      commit('DELETE_INVOICE', docId)             //Delete invoice w/ the id
-      await dispatch('GET_INVOICES')              //Get the invoice array exclueding the id
-      commit('TOGGLE_INVOICE')
-      commit('TOGGLE_EDIT_INVOICE')
-      commit('SET_CURRENT_INVOICE', routeId)
-    }
+    async UPDATE_INVOICE({ commit, dispatch }, { docId, routeId }) {
+      commit("DELETE_INVOICE", docId);
+      await dispatch("GET_INVOICES");
+      commit("TOGGLE_INVOICE");
+      commit("TOGGLE_EDIT_INVOICE");
+      commit("SET_CURRENT_INVOICE", routeId);
+    },
   },
 
   modules: {}

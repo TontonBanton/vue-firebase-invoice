@@ -73,7 +73,7 @@ const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
     const futureDate = new Date();                                                                            //Get the initial current date
     paymentDueDateUnix.value = futureDate.setDate(futureDate.getDate() + parseInt(termsSelect));              //Get timestamp + terms
     paymentDueDate.value = new Date(paymentDueDateUnix.value).toLocaleDateString("en-us", dateOptions.value); //Format
-    console.log(paymentDueDateUnix.value, paymentDueDate.value)
+    //console.log(paymentDueDateUnix.value, paymentDueDate.value)
   });
 
   const addNewInvoiceItem = ()=> {
@@ -90,12 +90,13 @@ const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
   }
 
   //Saving data on submit
-  const submitForm = ()=> {
-    if (editInvoice){
-      updateInvoice()
-    }
-    uploadInvoice()
+  const submitForm = () => {
+  if (editInvoice.value) {
+    updateInvoice(); // Update existing invoice
+  } else {
+    uploadInvoice(); // Create new invoice
   }
+}
 
   const uploadInvoice = async () => {
     if (invoiceItemList.value.length <= 0) {
@@ -143,45 +144,46 @@ const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
   }
 
   const updateInvoice = async () => {
-    if (invoiceItemList.value.length <= 0) {
-      alert('Please enter required data');
-      return;
-    }
-    loading.value = true
-    calInvoiceTotal();
-
-    //FIREBASE UPDATE
-    const invoiceRef = doc(db, 'invoices', docId.value);    // Get a reference to the document to update
-    try {
-      await updateDoc(invoiceRef, {
-        billerStreetAddress: billerStreetAddress.value,
-        billerCity: billerCity.value,
-        billerZipCode: billerZipCode.value,
-        billerCountry: billerCountry.value,
-        clientName: clientName.value,
-        clientEmail: clientEmail.value,
-        clientStreetAddress: clientStreetAddress.value,
-        clientCity: clientCity.value,
-        clientZipCode: clientZipCode.value,
-        clientCountry: clientCountry.value,
-        paymentTerms: paymentTerms.value,
-        paymentDueDate: paymentDueDate.value,
-        paymentDueDateUnix: paymentDueDateUnix.value,
-        productDescription: productDescription.value,
-        invoiceItemList: invoiceItemList.value,
-        invoiceTotal: invoiceTotal.value,
-    });
-    const data = {
-      docId: docId.value,
-      routeId: route.params.invoiceId
-    }
-    store.dispatch('UPDATE_INVOICES', data);        //Execute Vuex Action passing docId and routeId
-    console.log('Invoice successfully updated!');
-    } catch (error) {
-      console.error('Error uploading invoice: ', error.message || error);
-    }
-    loading.value = false
+  if (invoiceItemList.value.length <= 0) {
+    alert('Please enter required data');
+    return;
   }
+  loading.value = true;
+  calInvoiceTotal();
+
+  // FIREBASE UPDATE
+  const invoiceRef = doc(db, 'invoices', docId.value); // Reference to the invoice document
+  try {
+    await updateDoc(invoiceRef, {
+      billerStreetAddress: billerStreetAddress.value,
+      billerCity: billerCity.value,
+      billerZipCode: billerZipCode.value,
+      billerCountry: billerCountry.value,
+      clientName: clientName.value,
+      clientEmail: clientEmail.value,
+      clientStreetAddress: clientStreetAddress.value,
+      clientCity: clientCity.value,
+      clientZipCode: clientZipCode.value,
+      clientCountry: clientCountry.value,
+      paymentTerms: paymentTerms.value,
+      paymentDueDate: paymentDueDate.value,
+      paymentDueDateUnix: paymentDueDateUnix.value,
+      productDescription: productDescription.value,
+      invoiceItemList: invoiceItemList.value,
+      invoiceTotal: invoiceTotal.value,
+    })
+    console.log('Invoice successfully updated!');
+  } catch (error) {
+    console.error('Error updating invoice: ', error.message || error);
+  }
+  const data = {
+      docId: docId.value,
+      routeId: route.params.invoiceId,
+  }
+  store.dispatch('UPDATE_INVOICE', data); // Update Vuex store
+  loading.value = false;
+  window.location.reload()
+}
 
 
   //For click on invoiceWrap main container show modal
@@ -320,7 +322,6 @@ const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
         <div class="right flex">
           <button v-if="!store.state.editInvoice" type="submit" @click="saveDraft" class="orange">Save Draft</button>
           <button v-if="!store.state.editInvoice" type="submit" @click="publishInvoice" class="orange">Create Invoice</button>
-
           <button v-if="store.state.editInvoice" type="submit" class="orange">Update Invoice</button>
         </div>
       </div>
