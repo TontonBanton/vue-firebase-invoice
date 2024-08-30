@@ -134,7 +134,7 @@ const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
         invoiceDraft: invoiceDraft.value,
         invoicePaid: null,
       });
-      console.log('Invoice successfully uploaded!');
+      console.log('Invoice successfully uploaded to server');
     } catch (error) {
       console.error('Error uploading invoice: ', error.message || error);
     }
@@ -182,9 +182,9 @@ const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
   }
   store.dispatch('UPDATE_INVOICE', data); // Update Vuex store
   loading.value = false;
-  window.location.reload()
+  alert('temporary reload fetch the db from fbase')
+  window.location.reload()           //Temporay reload solution
 }
-
 
   //For click on invoiceWrap main container show modal
   const invoiceWrap = ref(null)

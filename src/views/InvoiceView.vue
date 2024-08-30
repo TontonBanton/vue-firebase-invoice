@@ -1,17 +1,14 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+const router = useRouter()
 const route = useRoute()
 const store = useStore();
-
-import db from '@/firebase/firebaseinit';
-import { doc, getDoc } from 'firebase/firestore';
 
 const invoiceId = ref(null)
 const currentInvoice = ref(null); // Define currentInvoice as a ref
 const currentInvoiceArray= computed(() => store.state.currentInvoiceArray);
-//const editInvoice = computed(() => store.state.editInvoice);
 
 const toggleEditInvoice = ()=> {
   store.commit('TOGGLE_EDIT_INVOICE');
@@ -36,6 +33,12 @@ const formatCurrency = (value) => {
   return "0.00";
 };
 
+const deleteInvoice = async (docId) => {
+  await store.dispatch('DELETE_INVOICE', docId);
+  router.push({ name: "Home" })
+  store.dispatch('GET_INVOICES');  //Fetch the updated list of invoices after uploading
+}
+
 onMounted(()=> {
   getCurrentInvoice()
 })
@@ -43,7 +46,7 @@ onMounted(()=> {
 </script>
 
 <template>
-  {{  currentInvoice }}
+  <!-- {{  currentInvoice }} -->
   <div v-if="currentInvoice" class="invoice-view container">
     <router-link to="/" style="color:white;">
       <img src="@/assets/left-arrow.png" alt="" style="width: 15px; height: 15px" /> Back to List
