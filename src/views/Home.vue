@@ -38,7 +38,7 @@ const toggleFilterMenu = ()=> {
         </div>
       </div>
     </div>
-    <!--Loop invoiceData Load and Invoice Component-->
+    <!--Loop invoiceData Load and load on Invoice Component-->
     <div v-if="invoiceData.length > 0">
       <Invoice v-for="(invoice, index) in invoiceData" :invoice="invoice" :key="index"/>
     </div>

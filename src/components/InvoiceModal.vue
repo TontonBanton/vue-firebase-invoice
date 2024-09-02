@@ -182,7 +182,7 @@ const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
   }
   store.dispatch('UPDATE_INVOICE', data); // Update Vuex store
   loading.value = false;
-  alert('temporary reload fetch the db from fbase')
+  //alert('temporary reload fetch the db from fbase')
   window.location.reload()           //Temporay reload solution
 }
 

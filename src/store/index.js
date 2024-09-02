@@ -1,6 +1,6 @@
 import { createStore } from 'vuex';
 import db from '@/firebase/firebaseinit';
-import { collection, doc ,getDocs, deleteDoc } from 'firebase/firestore'; // Import from firestore
+import { collection, doc ,getDocs, deleteDoc, updateDoc } from 'firebase/firestore'; // Import from firestore
 
 export default createStore({
   state: {
@@ -33,12 +33,33 @@ export default createStore({
       console.log('set_invoice_data pushed on array latest: ' + JSON.stringify(billerZipCodes, null, 2));
     },
     SET_CURRENT_INVOICE(state, invoiceId){
+      //alert('running set_current mutation')
       state.currentInvoiceArray = state.invoiceData.filter(invoice => invoice.invoiceId === invoiceId)    //Create new currentInvoicearray with the dataId
       //alert('vuex Store setcurrent'+ JSON.stringify(state.currentInvoiceArray, null, 2));
     },
-    DELETE_INVOICE(state, payload) {
-      state.invoiceData = state.invoiceData.filter((invoice) => invoice.docId !== payload);
+    DELETE_INVOICE(state, docId) {
+      //alert('running delete_invoice')
+      state.invoiceData = state.invoiceData.filter((invoice) => invoice.docId !== docId);
     },
+    UPDATE_STATUS_TO_PAID(state, docId){
+      alert('mutating invoice_data')
+      alert(typeof state.invoiceData)
+      state.invoiceData.forEach((invoice)=> {
+        if (invoice.docId === docId) {
+          invoice.invoicePaid = true
+          invoice.invoicePending = false
+        }
+      })
+    },
+    UPDATE_STATUS_TO_PENDING(state, docId){
+      state.invoiceData.forEach((invoice)=> {
+        if (invoice.docId === docId) {
+          invoice.invoicePending = true
+          invoice.invoicePaid = false
+          invoice.invoiceDraft = false
+        }
+      })
+    }
   },
 
   actions: {
@@ -101,11 +122,30 @@ export default createStore({
       commit("SET_CURRENT_INVOICE", routeId);
     },
     async DELETE_INVOICE({ commit }, docId) {
-      const invoiceRef = doc(db, "invoices", docId);  // Reference to the document
-      await deleteDoc(invoiceRef);                    // Delete the document
+      const invoiceRef = doc(db, "invoices", docId);        // Reference to the document
+      await deleteDoc(invoiceRef);                          // Delete the document
       console.log('Invoice successfully deleted on server');
-      commit("DELETE_INVOICE", docId);                // Commit the mutation to remove it from the state
+      commit("DELETE_INVOICE", docId);                      // Commit the mutation to remove it from the state
     },
+
+    async UPDATE_STATUS_TO_PAID({commit}, docId) {
+      alert('entering action')
+      const invoiceRef = doc(db, "invoices", docId);          //UPDATE BACKEND
+      await updateDoc(invoiceRef, {
+        invoicePaid: true,
+        invoicePending: false,
+      });
+      commit("UPDATE_STATUS_TO_PAID", docId);                 //UPDATE FRONTEND
+    },
+    async UPDATE_STATUS_TO_PENDING({commit}, docId) {
+      const invoiceRef = doc(db, "invoices", docId);
+      await updateDoc(invoiceRef, {
+        invoicePending: true,
+        invoicePaid: false,
+        invoiceDraft: false
+      });
+      commit("UPDATE_STATUS_TO_PENDING", docId);
+    }
   },
 
   modules: {}

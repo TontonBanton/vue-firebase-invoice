@@ -17,6 +17,7 @@ const toggleEditInvoice = ()=> {
 
 const getCurrentInvoice = ()=> {
   invoiceId.value = route.params.invoiceId
+  //alert('dispatching vuex set_Current')
   store.commit('SET_CURRENT_INVOICE', invoiceId.value)
   currentInvoice.value = currentInvoiceArray.value[0] || null;
 }
@@ -37,6 +38,14 @@ const deleteInvoice = async (docId) => {
   await store.dispatch('DELETE_INVOICE', docId);
   router.push({ name: "Home" })
   store.dispatch('GET_INVOICES');  //Fetch the updated list of invoices after uploading
+}
+
+const updateStatusPaid = (docId)=> {
+  alert('dispatching UPDATESTATUS' + docId)
+  store.dispatch('UPDATE_STATUS_TO_PAID', docId)
+}
+const updateStatusPending = (docId)=> {
+  store.dispatch('UPDATE_STATUS_TO_PENDING', docId)
 }
 
 onMounted(()=> {
