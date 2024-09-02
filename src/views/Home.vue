@@ -11,9 +11,36 @@ const newInvoice = () => {
 };
 
 const filterMenu = ref(null)
+const filteredInvoice = ref(null)
+
 const toggleFilterMenu = ()=> {
   filterMenu.value = !filterMenu.value
 }
+const filteredInvoices = (e)=> {
+  if (e.target.innerText === 'Clear Filter') {
+    filteredInvoice.value = null
+    return
+  }
+  filteredInvoice.value = e.target.innerText
+}
+
+const filteredData= computed(() => {
+  return invoiceData.value.filter((invoice) => {    //Filter invoiceData
+    if (filteredInvoice === 'Draft') {              //Test for draft
+      return invoice.invoiceDraft === true          //Return invoice/invoices w/ invoiceDraft=true
+    }
+    if (filteredInvoice.value === 'Pending') {
+      return invoice.invoicePending === true;
+    }
+    if (filteredInvoice.value === 'Paid') {
+      return invoice.invoicePaid === true;
+    }
+    return invoice                                  //Return all invoice if no match
+  })
+
+});
+
+
 
 </script>
 
@@ -23,13 +50,13 @@ const toggleFilterMenu = ()=> {
       <!--Right-->
       <div class="right flex">
         <div @click="toggleFilterMenu" class="filter flex">
-          <span>Filter by status</span>
+          <span>Filter by status: <span> : {{ filteredInvoice }}</span> </span>
           <img src="@/assets/arrow-down.png" alt="" />
           <ul v-show="filterMenu" class="filter-menu orange">
-            <li>Draft</li>
-            <li>Pending</li>
-            <li>Paid</li>
-            <li>Clear Filter</li>
+            <li @click="filteredInvoices">Draft</li>
+            <li @click="filteredInvoices">Pending</li>
+            <li @click="filteredInvoices">Paid</li>
+            <li @click="filteredInvoices">Clear Filter</li>
           </ul>
         </div>
         <div @click="newInvoice" class="button flex orange">
@@ -40,7 +67,8 @@ const toggleFilterMenu = ()=> {
     </div>
     <!--Loop invoiceData Load and load on Invoice Component-->
     <div v-if="invoiceData.length > 0">
-      <Invoice v-for="(invoice, index) in invoiceData" :invoice="invoice" :key="index"/>
+      <!-- <Invoice v-for="(invoice, index) in invoiceData" :invoice="invoice" :key="index"/> -->
+      <Invoice v-for="(invoice, index) in filteredData" :invoice="invoice" :key="index"/>
     </div>
     <!--No Invoice Data-->
     <div v-else class="empty flex flex-column">

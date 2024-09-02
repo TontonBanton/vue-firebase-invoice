@@ -124,7 +124,7 @@ export default createStore({
     async DELETE_INVOICE({ commit }, docId) {
       const invoiceRef = doc(db, "invoices", docId);        // Reference to the document
       await deleteDoc(invoiceRef);                          // Delete the document
-      console.log('Invoice successfully deleted on server');
+      alert('Invoice successfully deleted on server');
       commit("DELETE_INVOICE", docId);                      // Commit the mutation to remove it from the state
     },
 

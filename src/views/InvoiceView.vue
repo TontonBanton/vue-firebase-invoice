@@ -41,7 +41,7 @@ const deleteInvoice = async (docId) => {
 }
 
 const updateStatusPaid = (docId)=> {
-  alert('dispatching UPDATESTATUS' + docId)
+  alert('dispatching UPDATES_STATUS' + docId)
   store.dispatch('UPDATE_STATUS_TO_PAID', docId)
 }
 const updateStatusPending = (docId)=> {
