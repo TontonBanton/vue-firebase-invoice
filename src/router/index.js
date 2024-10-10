@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../views/Home.vue";
+import HomeView from "../views/HomeView.vue";
 import InvoiceView from "../views/InvoiceView.vue";
 
 const routes = [
-  { path: "/", name: "Home", component: Home},
+  { path: "/", name: "Home", component: HomeView},
   { path: "/invoice/:invoiceId", name: "Invoice", component: InvoiceView}
 ];
 

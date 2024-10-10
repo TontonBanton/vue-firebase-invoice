@@ -1,4 +1,5 @@
 <script setup>
+import '@/styles/components/InvoiceStyle.scss'
 import { defineProps } from 'vue'
 
 const props = defineProps({
@@ -29,31 +30,3 @@ const props = defineProps({
   </router-link>
 </template>
 
-<style lang="scss" scoped>
-.invoice {
-  cursor: pointer;
-  text-decoration: none;
-  gap: 16px;
-  margin-bottom: 16px;
-  color: #fff;
-  border-radius: 20px;
-  padding: 28px 32px;
-  background-color: #21232e;
-  align-items: center;
-  span {font-size: 13px}
-
-  .left {
-    align-items: center;
-    flex-basis: 60%;
-    gap: 16px;
-    span {flex: 1;}
-    .tracking-number {text-transform: uppercase;}
-  }
-  .right {
-    gap: 16px;
-    flex-basis: 40%;
-    align-items: center;
-    .price { flex: 1; font-size: 16px; font-weight: 600px; }
-  }
-}
-</style>
