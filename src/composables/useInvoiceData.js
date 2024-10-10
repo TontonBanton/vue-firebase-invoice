@@ -1,4 +1,4 @@
-export function transformInvoiceData(doc) {
+export function firestoreInvoiceToObject(doc) {
 
   const transformedData = {
     docId: doc.id,

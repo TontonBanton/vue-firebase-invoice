@@ -21,8 +21,8 @@ const fetchInvoices = async () => {
 
 onMounted(() => {
   checkScreen();
-  fetchInvoices();                                  //Initial check
-  window.addEventListener('resize', checkScreen);    //CheckScreen @ resize DOM event
+  fetchInvoices();
+  window.addEventListener('resize', checkScreen);
 });
 
 onUnmounted(() => {
