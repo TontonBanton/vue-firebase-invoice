@@ -27,14 +27,6 @@
   color: #fff;
 }
 
-/* Animation classes for Vue transitions */
-.invoice-enter-active, .invoice-leave-active {
-  transition: 0.8s ease all;
-}
-.invoice-enter-from, .invoice-leave-to {
-  transform: translateX(-700px);
-}
-
 button, .button {
   cursor: pointer;
   padding: 16px 24px;

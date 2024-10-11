@@ -2,6 +2,7 @@
 import '@/styles/components/InvoiceStyle.scss'
 import { defineProps } from 'vue'
 
+//Object from HomeView filteredData Loop
 const props = defineProps({
   invoice: Object
 })

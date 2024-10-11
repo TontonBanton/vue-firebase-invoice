@@ -1,62 +1,49 @@
 import { createStore } from 'vuex';
 import db from '@/firebase/firebaseinit';
-import { collection, doc ,getDocs, deleteDoc, updateDoc } from 'firebase/firestore'; // Import from firestore
+import { collection, doc ,getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
 import { firestoreInvoiceToObject } from '@/composables/useInvoiceData'
 import { UPDATE_STATUS_TO_PAID, UPDATE_STATUS_TO_PENDING } from './statusMutations';
 
 export default createStore({
   state: {
+    invoiceData: [],
+    currentInvoiceArray: [],
     invoicesLoaded: null,
     invoiceModal: null,
     modalActive: null,
     editInvoice: null,
-
-    invoiceData: [],
-    currentInvoiceArray: [],
   },
 
   mutations: {
-    INVOICES_LOADED(state){
-      state.invoicesLoaded = true
-    },
+    UPDATE_STATUS_TO_PAID,
+    UPDATE_STATUS_TO_PENDING,
 
-    //Toggles Mutations
-    TOGGLE_INVOICE(state) {
-      state.invoiceModal = !state.invoiceModal;
-    },
-    TOGGLE_MODAL(state) {
-      state.modalActive = !state.modalActive;
-    },
-    TOGGLE_EDIT_INVOICE(state) {
-      state.editInvoice = !state.editInvoice;
-    },
+    INVOICES_LOADED(state) {state.invoicesLoaded = true},
+    TOGGLE_INVOICE(state) { state.invoiceModal = !state.invoiceModal;},
+    TOGGLE_MODAL(state) { state.modalActive = !state.modalActive;},
+    TOGGLE_EDIT_INVOICE(state) { state.editInvoice = !state.editInvoice;},
 
-    //Invoice Data Mutation
+    //Data Mutations
     SET_INVOICE_DATA(state, data){
       state.invoiceData.push(data)
     },
     SET_CURRENT_INVOICE(state, invoiceId){
-      //Create new currentInvoicearray with the dataId
+      //Create new currentInvoicearray with the id
       state.currentInvoiceArray = state.invoiceData.filter(invoice => invoice.invoiceId === invoiceId)
     },
     DELETE_INVOICE(state, docId) {
+      //Create new currentInvoicearray removing the id
       state.invoiceData = state.invoiceData.filter((invoice) => invoice.docId !== docId);
     },
-
-    UPDATE_STATUS_TO_PAID,
-    UPDATE_STATUS_TO_PENDING,
-
   },
 
   actions: {
-
     async GET_INVOICES({commit, state}){
       try {
         const invoicesCollection = collection(db, 'invoices');
         const querySnapshot = await getDocs(invoicesCollection);
-
         querySnapshot.forEach((invoiceDoc) => {
-          // Check if the invoice with the current docId doesn't already exist in invoiceData
+          // Check if the invoice with the current docId dont exist in invoiceData
           if (!state.invoiceData.some(invoice => invoice.docId === invoiceDoc.id)) {
             const invoiceObj = firestoreInvoiceToObject(invoiceDoc);
             commit('SET_INVOICE_DATA', invoiceObj)

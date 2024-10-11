@@ -31,19 +31,31 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div v-if="invoicesLoaded">
+  <div v-if="invoicesLoaded"> <!--Toggle after all SET_INVOICE_DATA is finished -->
+
+    <!--isMobile=True-->
     <div v-if="!isMobile" class="app flex flex-column">
       <Navigation/>
       <div class="app-content flex flex-column">
         <Modal v-if="modalActive"/>
-        <transition name="invoice">
-          <InvoiceModal v-if="invoiceModal" />
-        </transition>
+        <transition name="invoice"> <InvoiceModal v-if="invoiceModal" />  </transition>
         <router-view />
       </div>
     </div>
+     <!--isMobile=False-->
     <div v-else class="mobile-message flex flex-column">
       <h2>Mobile not yet supported</h2>
     </div>
+
   </div>
 </template>
+
+<style>
+/* Vue transition */
+.invoice-enter-active, .invoice-leave-active {
+  transition: 0.8s ease all;
+}
+.invoice-enter-from, .invoice-leave-to {
+  transform: translateX(-700px);
+}
+</style>
