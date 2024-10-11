@@ -9,8 +9,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <router-link class="invoice flex" style="color: white;"
-  :to="{ name: 'Invoice', params: {invoiceId: invoice.invoiceId} } " >
+  <router-link :to="{ name: 'InvoiceView', params: {invoiceId: invoice.invoiceId} }" class="invoice flex">
     <div class="left flex">
       <span class="tracking-number">#{{ invoice.invoiceId }}</span>
       <span class="due-date">{{ invoice.paymentDueDate }}</span>

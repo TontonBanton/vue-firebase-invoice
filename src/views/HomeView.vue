@@ -50,7 +50,7 @@ const filteredInvoices = computed(() => {
       </div>
     </div>
 
-    <!--Loop invoiceData to Invoice Component-->
+    <!--Loop invoiceData to INVOICE Component-->
     <div v-if="invoiceData.length > 0">
       <Invoice v-for="invoice in filteredInvoices" :invoice="invoice" :key="invoice.invoiceId"/>
     </div>

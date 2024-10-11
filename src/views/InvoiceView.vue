@@ -1,14 +1,14 @@
 <script setup>
 import '@/styles/InvoiceViewStyle.scss'
-import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useStore } from 'vuex';
+import { useFormatCurrency } from '@/composables/useFormatCurrency';
+import { ref, computed, onMounted } from 'vue';
+
+import { useRouter, useRoute } from 'vue-router';
 const router = useRouter()
 const route = useRoute()
-const store = useStore();
 
-const invoiceId = ref(null)
-const currentInvoice = ref(null); // Define currentInvoice as a ref
+import { useStore } from 'vuex';
+const store = useStore();
 const currentInvoiceArray= computed(() => store.state.currentInvoiceArray);
 
 const toggleEditInvoice = ()=> {
@@ -16,24 +16,17 @@ const toggleEditInvoice = ()=> {
   store.commit('TOGGLE_INVOICE');
 }
 
+const invoiceId = ref(null)
+const currentInvoice = ref(null); // Define currentInvoice as a ref
+
+onMounted(()=> {
+  getCurrentInvoice()
+})
 const getCurrentInvoice = ()=> {
   invoiceId.value = route.params.invoiceId
-  //alert('dispatching vuex set_Current')
   store.commit('SET_CURRENT_INVOICE', invoiceId.value)
   currentInvoice.value = currentInvoiceArray.value[0] || null;
 }
-
-const formatCurrency = (value) => {
-  // Convert the value to a number if it's a string (item.price)
-  const numericValue = typeof value === 'string' ? parseFloat(value) : value;
-  if (value !== null && value !== undefined) {
-    return numericValue.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  }
-  return "0.00";
-};
 
 const deleteInvoice = async (docId) => {
   await store.dispatch('DELETE_INVOICE', docId);
@@ -48,11 +41,6 @@ const updateStatusPaid = (docId)=> {
 const updateStatusPending = (docId)=> {
   store.dispatch('UPDATE_STATUS_TO_PENDING', docId)
 }
-
-onMounted(()=> {
-  getCurrentInvoice()
-})
-
 </script>
 
 <template>
@@ -61,6 +49,7 @@ onMounted(()=> {
     <router-link to="/" style="color:white;">
       <img src="@/assets/left-arrow.png" alt="" style="width: 15px; height: 15px" /> Back to List
     </router-link>
+
     <!-- Header -->
     <div class="header flex">
       <div class="left flex">
@@ -126,13 +115,13 @@ onMounted(()=> {
           <div v-for="(item, index) in currentInvoice.invoiceItemList" :key="index" class="item flex">
             <p>{{ item.itemName }}</p>
             <p>{{ item.qty }}</p>
-            <p>{{ formatCurrency(item.price) }}</p>
-            <p>{{ formatCurrency(item.total) }}</p>
+            <p>{{ useFormatCurrency(item.price) }}</p>
+            <p>{{ useFormatCurrency(item.total) }}</p>
           </div>
         </div>
         <div class="total flex orange">
           <p>Amount Due</p>
-          <p>{{ formatCurrency(currentInvoice.invoiceTotal) }}</p>
+          <p>{{ useFormatCurrency(currentInvoice.invoiceTotal) }}</p>
         </div>
       </div>
     </div>

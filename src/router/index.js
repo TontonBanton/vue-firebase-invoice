@@ -4,7 +4,7 @@ import InvoiceView from "../views/InvoiceView.vue";
 
 const routes = [
   { path: "/", name: "Home", component: HomeView},
-  { path: "/invoice/:invoiceId", name: "Invoice", component: InvoiceView}
+  { path: "/invoice/:invoiceId", name: "InvoiceView", component: InvoiceView}
 ];
 
 const router = createRouter({
