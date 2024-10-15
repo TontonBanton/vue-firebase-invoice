@@ -13,7 +13,7 @@ const toggleFilterMenu = ()=> filterShow.value = !filterShow.value
 
 const currentFilter = ref(null)
 const setFilter = (e) => {
-  const selectedFilter = e.target.innerText;
+  const selectedFilter = e.target.innerText;   //Get the text in the <li>
   currentFilter.value = (selectedFilter === 'Clear' || selectedFilter === 'Draft') ? null : selectedFilter;
 }
 
@@ -22,7 +22,6 @@ const filteredInvoices = computed(() => {
     //For invoicePending=true InvoicePaid=true condition
     const statusFilter = `invoice${currentFilter.value}`;
     const matchInvoices = invoiceData.value.filter(invoice => invoice[statusFilter] === true );
-
   return matchInvoices;
 });
 
@@ -30,25 +29,10 @@ const filteredInvoices = computed(() => {
 
 <template>
   <div class="home container">
-    <!--Header-->
-    <div class="header flex">
-      <div class="right flex">
-        <div @click="toggleFilterMenu" class="filter flex">
-          <span>Filter by status: <span> : {{ currentFilter }}</span> </span>
-          <img src="@/assets/arrow-down.png" alt="" />
-          <ul v-show="filterShow" class="filter-menu orange"> <!--Show only when true-->
-            <li @click="setFilter">Draft</li>
-            <li @click="setFilter">Pending</li>
-            <li @click="setFilter">Paid</li>
-            <li @click="setFilter">Clear</li>
-          </ul>
-        </div>
-        <div @click="newInvoice" class="button flex orange">
-          <div class="inner-button flex"><img src="@/assets/plus-icon.png" alt="" /></div>
-          <span>New Invoice</span>
-        </div>
-      </div>
-    </div>
+    <StatusHeader :invoice="currentInvoice"
+      @edit="toggleEditInvoice" @delete="deleteInvoice"
+      @markPaid="updateStatusPaid" @markPending="updateStatusPending"
+    />
 
     <!--Loop invoiceData to INVOICE Component-->
     <div v-if="invoiceData.length > 0">
