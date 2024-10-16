@@ -1,0 +1,69 @@
+// src/composables/useInvoiceActions.js
+import { doc, setDoc, updateDoc, collection } from 'firebase/firestore';
+import db from '@/firebase/firebaseinit';
+import { uid } from 'uid';
+import { ref } from 'vue';
+
+export function useInvoiceActions() {
+  const loading = ref(false);
+
+  const uploadInvoice = async (form, calculateInvoiceTotal, store) => {
+    if (form.invoiceItemList.length <= 0) {
+      alert('Please enter required data');
+      return;
+    }
+    loading.value = true;
+    calculateInvoiceTotal();
+
+    // FIREBASE ADD
+    const invoicesCollectionRef = collection(db, 'invoices'); // Reference to the "invoices" collection
+    const newInvoiceRef = doc(invoicesCollectionRef); // Create a new document in the "invoices" collection with a generated ID
+    try {
+      await setDoc(newInvoiceRef, {
+        invoiceId: uid(6),
+        ...form, // spread all form fields
+        invoicePaid: null,
+      });
+      console.log('Successfully uploaded');
+    } catch (error) {
+      console.error('Error uploading invoice: ', error.message || error);
+    }
+    loading.value = false;
+    store.commit('TOGGLE_INVOICE');
+    store.dispatch('GET_INVOICES'); // Fetch the updated list of invoices after uploading
+  };
+
+  const updateInvoice = async (form, calculateInvoiceTotal, store, route) => {
+    if (form.invoiceItemList.length <= 0) {
+      alert('Please enter required data');
+      return;
+    }
+    loading.value = true;
+    calculateInvoiceTotal();
+
+    // FIREBASE UPDATE
+    const invoiceRef = doc(db, 'invoices', form.docId); // Reference to the invoice document
+    try {
+      await updateDoc(invoiceRef, {
+        ...form, // spread all form fields
+      });
+      console.log('Invoice successfully updated!');
+    } catch (error) {
+      console.error('Error updating invoice: ', error.message || error);
+    }
+
+    const data = {
+      docId: form.docId,
+      routeId: route.params.invoiceId,
+    };
+    store.dispatch('UPDATE_INVOICE', data); // Update Vuex store
+    loading.value = false;
+    window.location.reload(); // Temporary solution for refreshing data
+  };
+
+  return {
+    loading,
+    uploadInvoice,
+    updateInvoice,
+  };
+}

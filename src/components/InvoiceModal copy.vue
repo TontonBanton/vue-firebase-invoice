@@ -1,44 +1,97 @@
 <script setup>
 import '@/styles/components/InvoiceModalStyle.scss'
 import Loading from '@/components/Loading.vue'
-import { onMounted, watch, ref, computed } from 'vue'
-import db from '@/firebase/firebaseinit'
 import { collection, doc, setDoc, updateDoc } from 'firebase/firestore'
-import { uid } from 'uid'
+import db from '@/firebase/firebaseinit'
+import { ref, computed ,onMounted, watch } from 'vue'
+import { uid } from 'uid';
 
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 const route = useRoute()
 const store = useStore();
 
-import { useInvoiceForm } from '@/composables/useInvoiceForm'
-const { form, populateForm, addNewInvoiceItem, deleteInvoiceItem, calculateInvoiceTotal } = useInvoiceForm();
-
-
 const editInvoice = computed(() => store.state.editInvoice);
 const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
 
 const loading = ref(null);
-const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
-//const paymentTerms = ref(0)
+
+  const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
+  const docId = ref(null);
+  const billerStreetAddress = ref(null);
+  const billerCity = ref(null);
+  const billerZipCode = ref(null);
+  const billerCountry = ref(null);
+  const clientName = ref(null);
+  const clientEmail = ref(null);
+  const clientStreetAddress = ref(null);
+  const clientCity = ref(null);
+  const clientZipCode = ref(null);
+  const clientCountry = ref(null);
+  const invoiceDateUnix = ref(null);
+  const invoiceDate = ref(null);
+  const paymentTerms = ref(null);
+  const paymentDueDateUnix = ref(null);
+  const paymentDueDate = ref(null);
+  const productDescription = ref(null);
+  const invoicePending = ref(null);
+  const invoiceDraft = ref(null);
+  const invoiceItemList = ref([]);
+  const invoiceTotal = ref(0);
 
   onMounted(() => {
+  //For New Invoice
   if (!editInvoice.value) {
     invoiceDateUnix.value = Date.now();
-    invoiceDate.value = new Date(invoiceDateUnix.value).toLocaleDateString('en-us', dateOptions.value);e
+    invoiceDate.value = new Date(invoiceDateUnix.value).toLocaleDateString('en-us', dateOptions.value);
+  //For Edit Invoice
   } else {
+    //POPULATE
     const currentInvoice = currentInvoiceArray.value[0];
-    populateForm(currentInvoice);
+    alert('fetchdata')
+    docId.value = currentInvoice.docId;
+    billerStreetAddress.value = currentInvoice.billerStreetAddress;
+    billerCity.value = currentInvoice.billerCity;
+    billerZipCode.value = currentInvoice.billerZipCode;
+    billerCountry.value = currentInvoice.billerCountry;
+    clientName.value = currentInvoice.clientName;
+    clientEmail.value = currentInvoice.clientEmail;
+    clientStreetAddress.value = currentInvoice.clientStreetAddress;
+    clientCity.value = currentInvoice.clientCity;
+    clientZipCode.value = currentInvoice.clientZipCode;
+    clientCountry.value = currentInvoice.clientCountry;
+    invoiceDateUnix.value = currentInvoice.invoiceDateUnix;
+    invoiceDate.value = currentInvoice.invoiceDate;
+    paymentTerms.value = currentInvoice.paymentTerms;
+    paymentDueDateUnix.value = currentInvoice.paymentDueDateUnix;
+    paymentDueDate.value = currentInvoice.paymentDueDate;
+    productDescription.value = currentInvoice.productDescription;
+    invoicePending.value = currentInvoice.invoicePending;
+    invoiceDraft.value = currentInvoice.invoiceDraft;
+    invoiceItemList.value = currentInvoice.invoiceItemList;
+    invoiceTotal.value = currentInvoice.invoiceTotal;
   }
   });
 
-  watch(form.paymentTerms, (termsSelect) => {                                                                      //Watch change value in term option
+  watch(paymentTerms, (termsSelect) => {                                                                      //Watch change value in term option
     const futureDate = new Date();                                                                            //Get the initial current date
     paymentDueDateUnix.value = futureDate.setDate(futureDate.getDate() + parseInt(termsSelect));              //Get timestamp + terms
     paymentDueDate.value = new Date(paymentDueDateUnix.value).toLocaleDateString("en-us", dateOptions.value); //Format
     //console.log(paymentDueDateUnix.value, paymentDueDate.value)
   });
 
+  const addNewInvoiceItem = ()=> {
+    invoiceItemList.value.push({ id: uid(), itemName: "", qty: "", price: 0, total: 0 })
+  }
+  const deleteInvoiceItem = (xid)=> {
+    invoiceItemList.value = invoiceItemList.value.filter(item => item.id !== xid )
+  }
+  const calInvoiceTotal = ()=> {
+    invoiceTotal.value = 0
+    invoiceItemList.value.forEach((item) => {
+      invoiceTotal.value += item.total
+    })
+  }
 
   //Saving data on submit
   const submitForm = () => {
@@ -50,12 +103,12 @@ const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
 }
 
   const uploadInvoice = async () => {
-    if (form.invoiceItemList.length <= 0) {
+    if (invoiceItemList.value.length <= 0) {
       alert('Please enter required data');
       return;
     }
-    loading.value = true;
-    calculateInvoiceTotal();
+    loading.value = true
+    calInvoiceTotal();
 
     //FIREBASE ADD
     const invoicesCollectionRef = collection(db, 'invoices');   // Get a reference to the "invoices" collection
@@ -85,7 +138,7 @@ const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
         invoiceDraft: invoiceDraft.value,
         invoicePaid: null,
       });
-      console.log('Successfully uploaded');
+      console.log('Invoice successfully uploaded to server');
     } catch (error) {
       console.error('Error uploading invoice: ', error.message || error);
     }
@@ -95,15 +148,15 @@ const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
   }
 
   const updateInvoice = async () => {
-  if (form.invoiceItemList.length <= 0) {
+  if (invoiceItemList.value.length <= 0) {
     alert('Please enter required data');
     return;
   }
   loading.value = true;
-  calculateInvoiceTotal();
+  calInvoiceTotal();
 
   // FIREBASE UPDATE
-  const invoiceRef = doc(db, 'invoices', form.docId); // Reference to the invoice document
+  const invoiceRef = doc(db, 'invoices', docId.value); // Reference to the invoice document
   try {
     await updateDoc(invoiceRef, {
       billerStreetAddress: billerStreetAddress.value,
@@ -147,6 +200,7 @@ const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
 
   const saveDraft = ()=> invoiceDraft.value = true
   const publishInvoice = ()=>  invoicePending.value = true
+
   const closeInvoice = ()=> {
     store.commit('TOGGLE_INVOICE');
     if (store.state.editInvoice === true ) {
@@ -168,20 +222,20 @@ const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
         <h4 class>Bill From</h4>
         <div class="input flex flex-column">
           <label for="billerStreetAddress">Street Address</label>
-          <input required type="text" id="billerStreetAddress" v-model="form.billerStreetAddress" />
+          <input required type="text" id="billerStreetAddress" v-model="billerStreetAddress" />
         </div>
         <div class="location-details flex">
           <div class="input flex flex-column">
             <label for="billerCity">City</label>
-            <input required type="text" id="billerCity" v-model="form.billerCity" />
+            <input required type="text" id="billerCity" v-model="billerCity" />
           </div>
           <div class="input flex flex-column">
             <label for="billerZipCode">Zip Code</label>
-            <input required type="text" id="billerZipCode" v-model="form.billerZipCode" />
+            <input required type="text" id="billerZipCode" v-model="billerZipCode" />
           </div>
           <div class="input flex flex-column">
             <label for="billerCountry">Country</label>
-            <input required type="text" id="billerCountry" v-model="form.billerCountry" />
+            <input required type="text" id="billerCountry" v-model="billerCountry" />
           </div>
         </div>
       </div>
@@ -191,28 +245,28 @@ const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
         <h4>Bill To</h4>
         <div class="input flex flex-column">
           <label for="clientName">Client's Name</label>
-          <input required type="text" id="clientName" v-model="form.clientName" />
+          <input required type="text" id="clientName" v-model="clientName" />
         </div>
         <div class="input flex flex-column">
           <label for="clientEmail">Client's Email</label>
-          <input required type="text" id="clientEmail" v-model="form.clientEmail" />
+          <input required type="text" id="clientEmail" v-model="clientEmail" />
         </div>
         <div class="input flex flex-column">
           <label for="clientStreetAddress">Street Address</label>
-          <input required type="text" id="clientStreetAddress" v-model="form.clientStreetAddress" />
+          <input required type="text" id="clientStreetAddress" v-model="clientStreetAddress" />
         </div>
         <div class="location-details flex">
           <div class="input flex flex-column">
             <label for="clientCity">City</label>
-            <input required type="text" id="clientCity" v-model="form.clientCity" />
+            <input required type="text" id="clientCity" v-model="clientCity" />
           </div>
           <div class="input flex flex-column">
             <label for="clientZipCode">Zip Code</label>
-            <input required type="text" id="clientZipCode" v-model="form.clientZipCode" />
+            <input required type="text" id="clientZipCode" v-model="clientZipCode" />
           </div>
           <div class="input flex flex-column">
             <label for="clientCountry">Country</label>
-            <input required type="text" id="clientCountry" v-model="form.clientCountry" />
+            <input required type="text" id="clientCountry" v-model="clientCountry" />
           </div>
         </div>
       </div>
@@ -222,23 +276,23 @@ const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
         <div class="payment flex">
           <div class="input flex flex-column">
             <label for="invoiceDate">Invoice Date</label>
-            <input disabled type="text" id="invoiceDate" v-model="form.invoiceDate" />
+            <input disabled type="text" id="invoiceDate" v-model="invoiceDate" />
           </div>
           <div class="input flex flex-column">
             <label for="paymentDueDate">Payment Due</label>
-            <input disabled type="text" id="paymentDueDate" v-model="form.paymentDueDate" />
+            <input disabled type="text" id="paymentDueDate" v-model="paymentDueDate" />
           </div>
         </div>
         <div class="input flex flex-column">
           <label for="paymentTerms">Payment Terms</label>
-          <select require id="paymentTerms" v-model="form.paymentTerms">
+          <select require id="paymentTerms" v-model="paymentTerms">
             <option value="30">Net 30 Days</option>
             <option value="60">Net 60 Days</option>
           </select>
         </div>
         <div class="input flex flex-column">
           <label for="productDescription">Product Description</label>
-          <input required type="text" id="productDescription" v-model="form.productDescription" />
+          <input required type="text" id="productDescription" v-model="productDescription" />
         </div>
         <div class="work-items">
           <h4>Item List</h4>
@@ -249,7 +303,7 @@ const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
               <th class="price">Price</th>
               <th class="total">Total</th>
             </tr>
-            <tr class="table-items flex" v-for="(item, index) in form.invoiceItemList" :key="index">
+            <tr class="table-items flex" v-for="(item, index) in invoiceItemList" :key="index">
               <td class="item-name"><input type="text" v-model="item.itemName" /></td>
               <td class="qty"><input type="text" v-model="item.qty" /></td>
               <td class="price"><input type="text" v-model="item.price" /></td>

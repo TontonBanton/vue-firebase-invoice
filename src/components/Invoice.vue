@@ -2,7 +2,6 @@
 import '@/styles/components/InvoiceStyle.scss'
 import { defineProps } from 'vue'
 
-//Object from HomeView filteredData Loop
 const props = defineProps({
   invoice: Object
 })
@@ -10,6 +9,7 @@ const props = defineProps({
 
 <template>
   <router-link :to="{ name: 'InvoiceView', params: {invoiceId: invoice.invoiceId} }" class="invoice flex">
+
     <div class="left flex">
       <span class="tracking-number">#{{ invoice.invoiceId }}</span>
       <span class="due-date">{{ invoice.paymentDueDate }}</span>
@@ -27,6 +27,7 @@ const props = defineProps({
         <img src="@/assets/right-arrow.png" alt="" style="width: 15px; height: 15px" />
       </div>
     </div>
+
   </router-link>
 </template>
 

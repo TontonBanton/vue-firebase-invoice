@@ -4,8 +4,6 @@ import { useFormatCurrency } from '@/composables/useFormatCurrency';
 const props = defineProps({
   currentItems: Object
 })
-
-
 </script>
 
 <template>
