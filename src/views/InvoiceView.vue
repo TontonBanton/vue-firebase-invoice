@@ -54,7 +54,7 @@ const toggleEditInvoice = ()=> {
 
     <div class="invoice-details flex flex-column">
       <InvoiceDetails :currentInvoice="currentInvoice" />
-      <InvoiceItems :currentItems="currentInvoice.invoiceItemList" />
+      <InvoiceItems :currentItems="currentInvoice" />
     </div>
   </div>
 </template>

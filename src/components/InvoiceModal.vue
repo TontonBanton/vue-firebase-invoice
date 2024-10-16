@@ -3,66 +3,52 @@ import '@/styles/components/InvoiceModalStyle.scss'
 import Loading from '@/components/Loading.vue'
 import { onMounted, watch, ref, computed } from 'vue'
 import db from '@/firebase/firebaseinit'
-import { collection, doc, setDoc, updateDoc } from 'firebase/firestore'
-import { uid } from 'uid'
+import { doc, updateDoc } from 'firebase/firestore'
 
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 const route = useRoute()
 const store = useStore();
-
-import { useInvoiceForm } from '@/composables/useInvoiceForm'
-const { form, populateForm, addNewInvoiceItem, deleteInvoiceItem, calculateInvoiceTotal } = useInvoiceForm();
-
-
 const editInvoice = computed(() => store.state.editInvoice);
 const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
 
+import { useInvoiceForm } from '@/composables/useInvoiceForm'
+const { form, populateForm, addNewInvoiceItem, deleteInvoiceItem, calculateInvoiceTotal } = useInvoiceForm();
+import { useInvoiceActions } from '@/composables/useInvoiceActions';
+const { uploadInvoice } = useInvoiceActions();
+
 const loading = ref(null);
 const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
-//const paymentTerms = ref(0)
 
-  onMounted(() => {
+onMounted(() => {
   if (!editInvoice.value) {
-    invoiceDateUnix.value = Date.now();
-    invoiceDate.value = new Date(invoiceDateUnix.value).toLocaleDateString('en-us', dateOptions.value);e
+    form.invoiceDateUnix = Date.now();
+    form.invoiceDate= new Date(form.invoiceDateUnix).toLocaleDateString('en-us', dateOptions.value)
   } else {
     const currentInvoice = currentInvoiceArray.value[0];
     populateForm(currentInvoice);
   }
-  });
+});
 
-  watch(form.paymentTerms, (termsSelect) => {                                                                      //Watch change value in term option
-    const futureDate = new Date();                                                                            //Get the initial current date
-    paymentDueDateUnix.value = futureDate.setDate(futureDate.getDate() + parseInt(termsSelect));              //Get timestamp + terms
-    paymentDueDate.value = new Date(paymentDueDateUnix.value).toLocaleDateString("en-us", dateOptions.value); //Format
-    //console.log(paymentDueDateUnix.value, paymentDueDate.value)
-  });
-
-
-  //Saving data on submit
-  const submitForm = () => {
-  if (editInvoice.value) {
-    updateInvoice(); // Update existing invoice
-  } else {
-    uploadInvoice(); // Create new invoice
+  watch(() => form.paymentTerms, (termsSelect) => {
+  if (termsSelect !== undefined && termsSelect !== null) {
+    const futureDate = new Date();
+    form.paymentDueDateUnix = futureDate.setDate(futureDate.getDate() + parseInt(termsSelect));
+    form.paymentDueDate = new Date(form.paymentDueDateUnix).toLocaleDateString("en-us", dateOptions.value);
   }
-}
+  });
 
-  const uploadInvoice = async () => {
+  const updateInvoice = async () => {
     if (form.invoiceItemList.length <= 0) {
       alert('Please enter required data');
       return;
     }
     loading.value = true;
     calculateInvoiceTotal();
-
-    //FIREBASE ADD
-    const invoicesCollectionRef = collection(db, 'invoices');   // Get a reference to the "invoices" collection
-    const newInvoiceRef = doc(invoicesCollectionRef);           // Create a new document in the "invoices" collection with a generated ID
+    // FIREBASE UPDATE
+    const invoiceRef = doc(db, 'invoices', form.docId); // Reference to the invoice document
     try {
-      await setDoc(newInvoiceRef, {
-        invoiceId: uid(6),
+      await updateDoc(invoiceRef, {
         billerStreetAddress: billerStreetAddress.value,
         billerCity: billerCity.value,
         billerZipCode: billerZipCode.value,
@@ -73,68 +59,25 @@ const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
         clientCity: clientCity.value,
         clientZipCode: clientZipCode.value,
         clientCountry: clientCountry.value,
-        invoiceDate: invoiceDate.value,
-        invoiceDateUnix: invoiceDateUnix.value,
         paymentTerms: paymentTerms.value,
         paymentDueDate: paymentDueDate.value,
         paymentDueDateUnix: paymentDueDateUnix.value,
         productDescription: productDescription.value,
         invoiceItemList: invoiceItemList.value,
         invoiceTotal: invoiceTotal.value,
-        invoicePending: invoicePending.value,
-        invoiceDraft: invoiceDraft.value,
-        invoicePaid: null,
-      });
-      console.log('Successfully uploaded');
+      })
+      console.log('Invoice successfully updated!');
     } catch (error) {
-      console.error('Error uploading invoice: ', error.message || error);
+      console.error('Error updating invoice: ', error.message || error);
     }
-    loading.value = false
-    store.commit('TOGGLE_INVOICE');
-    store.dispatch('GET_INVOICES');  //Fetch the updated list of invoices after uploading
-  }
-
-  const updateInvoice = async () => {
-  if (form.invoiceItemList.length <= 0) {
-    alert('Please enter required data');
-    return;
-  }
-  loading.value = true;
-  calculateInvoiceTotal();
-
-  // FIREBASE UPDATE
-  const invoiceRef = doc(db, 'invoices', form.docId); // Reference to the invoice document
-  try {
-    await updateDoc(invoiceRef, {
-      billerStreetAddress: billerStreetAddress.value,
-      billerCity: billerCity.value,
-      billerZipCode: billerZipCode.value,
-      billerCountry: billerCountry.value,
-      clientName: clientName.value,
-      clientEmail: clientEmail.value,
-      clientStreetAddress: clientStreetAddress.value,
-      clientCity: clientCity.value,
-      clientZipCode: clientZipCode.value,
-      clientCountry: clientCountry.value,
-      paymentTerms: paymentTerms.value,
-      paymentDueDate: paymentDueDate.value,
-      paymentDueDateUnix: paymentDueDateUnix.value,
-      productDescription: productDescription.value,
-      invoiceItemList: invoiceItemList.value,
-      invoiceTotal: invoiceTotal.value,
-    })
-    console.log('Invoice successfully updated!');
-  } catch (error) {
-    console.error('Error updating invoice: ', error.message || error);
-  }
-  const data = {
-      docId: docId.value,
-      routeId: route.params.invoiceId,
-  }
-  store.dispatch('UPDATE_INVOICE', data); // Update Vuex store
-  loading.value = false;
-  //alert('temporary reload fetch the db from fbase')
-  window.location.reload()           //Temporay reload solution
+    const data = {
+        docId: docId.value,
+        routeId: route.params.invoiceId,
+    }
+    store.dispatch('UPDATE_INVOICE', data); // Update Vuex store
+    loading.value = false;
+    //alert('temporary reload fetch the db from fbase')
+    window.location.reload()           //Temporay reload solution
 }
 
   //For click on invoiceWrap main container show modal
@@ -145,8 +88,20 @@ const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
     }
   }
 
-  const saveDraft = ()=> invoiceDraft.value = true
-  const publishInvoice = ()=>  invoicePending.value = true
+  const submitForm = () => {
+  if (editInvoice.value) {
+    updateInvoice(); // Update existing invoice
+  } else {
+    loading.value = true;
+    calculateInvoiceTotal();
+    uploadInvoice(form); // Create new invoice
+    loading.value = false;
+    store.commit('TOGGLE_INVOICE');
+    store.dispatch('GET_INVOICES'); // Fetch the updated list of invoices after uploading
+  }};
+
+  const saveDraft = ()=> form.invoiceDraft = true
+  const publishInvoice = ()=>  form.invoicePending = true
   const closeInvoice = ()=> {
     store.commit('TOGGLE_INVOICE');
     if (store.state.editInvoice === true ) {

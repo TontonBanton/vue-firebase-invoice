@@ -16,7 +16,7 @@ const props = defineProps({
         <p>Total</p>
       </div>
       <!--Loop the items-->
-      <div v-for="(item, index) in currentItems" :key="index" class="item flex">
+      <div v-for="(item, index) in currentItems.invoiceItemList" :key="index" class="item flex">
         <p>{{ item.itemName }}</p>
         <p>{{ item.qty }}</p>
         <p>{{ useFormatCurrency(item.price) }}</p>
