@@ -13,9 +13,9 @@ const editInvoice = computed(() => store.state.editInvoice);
 const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
 
 import { useInvoiceForm } from '@/composables/useInvoiceForm'
-const { form, populateForm, addNewInvoiceItem, deleteInvoiceItem, calculateInvoiceTotal } = useInvoiceForm();
 import { useInvoiceActions } from '@/composables/useInvoiceActions';
-const { uploadInvoice } = useInvoiceActions();
+const { form, populateForm, addNewInvoiceItem, deleteInvoiceItem, calculateInvoiceTotal } = useInvoiceForm();
+const { uploadInvoice, updateInvoice } = useInvoiceActions();
 
 const loading = ref(null);
 const dateOptions = ref({ year: "numeric", month: "short", day: "numeric" });
@@ -30,55 +30,65 @@ onMounted(() => {
   }
 });
 
-  watch(() => form.paymentTerms, (termsSelect) => {
-  if (termsSelect !== undefined && termsSelect !== null) {
-    const futureDate = new Date();
-    form.paymentDueDateUnix = futureDate.setDate(futureDate.getDate() + parseInt(termsSelect));
-    form.paymentDueDate = new Date(form.paymentDueDateUnix).toLocaleDateString("en-us", dateOptions.value);
-  }
-  });
-
-  const updateInvoice = async () => {
-    if (form.invoiceItemList.length <= 0) {
-      alert('Please enter required data');
-      return;
-    }
+const submitForm = () => {
+  if (editInvoice.value) {
     loading.value = true;
     calculateInvoiceTotal();
-    // FIREBASE UPDATE
-    const invoiceRef = doc(db, 'invoices', form.docId); // Reference to the invoice document
-    try {
-      await updateDoc(invoiceRef, {
-        billerStreetAddress: billerStreetAddress.value,
-        billerCity: billerCity.value,
-        billerZipCode: billerZipCode.value,
-        billerCountry: billerCountry.value,
-        clientName: clientName.value,
-        clientEmail: clientEmail.value,
-        clientStreetAddress: clientStreetAddress.value,
-        clientCity: clientCity.value,
-        clientZipCode: clientZipCode.value,
-        clientCountry: clientCountry.value,
-        paymentTerms: paymentTerms.value,
-        paymentDueDate: paymentDueDate.value,
-        paymentDueDateUnix: paymentDueDateUnix.value,
-        productDescription: productDescription.value,
-        invoiceItemList: invoiceItemList.value,
-        invoiceTotal: invoiceTotal.value,
-      })
-      console.log('Invoice successfully updated!');
-    } catch (error) {
-      console.error('Error updating invoice: ', error.message || error);
-    }
-    const data = {
-        docId: docId.value,
-        routeId: route.params.invoiceId,
-    }
-    store.dispatch('UPDATE_INVOICE', data); // Update Vuex store
+    updateInvoice(form);
+    const data = { docId: form.docId, routeId: route.params.invoiceId,}
+    store.dispatch('UPDATE_INVOICE', data);
     loading.value = false;
-    //alert('temporary reload fetch the db from fbase')
-    window.location.reload()           //Temporay reload solution
+  } else {
+    loading.value = true;
+    calculateInvoiceTotal();
+    uploadInvoice(form); // Create new invoice
+    loading.value = false;
+    store.commit('TOGGLE_INVOICE');
+    store.dispatch('GET_INVOICES'); // Fetch the updated list of invoices after uploading
+  }
+};
+
+watch(() => form.paymentTerms, (termsSelect) => {
+if (termsSelect !== undefined && termsSelect !== null) {
+  const futureDate = new Date();
+  form.paymentDueDateUnix = futureDate.setDate(futureDate.getDate() + parseInt(termsSelect));
+  form.paymentDueDate = new Date(form.paymentDueDateUnix).toLocaleDateString("en-us", dateOptions.value);
 }
+});
+
+
+// const updateInvoice = async () => {
+//   if (form.invoiceItemList.value <= 0) {
+//     alert('Please enter required data');
+//     return;
+//   }
+//   // FIREBASE UPDATE
+//   const invoiceRef = doc(db, 'invoices', form.docId); // Reference to the invoice document
+//   try {
+//     await updateDoc(invoiceRef, {
+//       billerStreetAddress: form.billerStreetAddress,
+//       billerCity: form.billerCity,
+//       billerZipCode: form.billerZipCode,
+//       billerCountry: form.billerCountry,
+//       clientName: form.clientName,
+//       clientEmail: form.clientEmail,
+//       clientStreetAddress: form.clientStreetAddress,
+//       clientCity: form.clientCity,
+//       clientZipCode: form.clientZipCode,
+//       clientCountry: form.clientCountry,
+//       paymentTerms: form.paymentTerms,
+//       paymentDueDate: form.paymentDueDate,
+//       paymentDueDateUnix: form.paymentDueDateUnix,
+//       productDescription: form.productDescription,
+//       invoiceItemList: form.invoiceItemList,
+//       invoiceTotal: form.invoiceTotal,
+//     })
+//     console.log('Invoice successfully updated!');
+//   } catch (error) {
+//     console.error('Error updating invoice: ', error.message || error);
+//   }
+//   window.location.reload()                  //alert('temporary reload fetch the db from fbase')
+// }
 
   //For click on invoiceWrap main container show modal
   const invoiceWrap = ref(null)
@@ -87,18 +97,6 @@ onMounted(() => {
       store.commit('TOGGLE_MODAL');
     }
   }
-
-  const submitForm = () => {
-  if (editInvoice.value) {
-    updateInvoice(); // Update existing invoice
-  } else {
-    loading.value = true;
-    calculateInvoiceTotal();
-    uploadInvoice(form); // Create new invoice
-    loading.value = false;
-    store.commit('TOGGLE_INVOICE');
-    store.dispatch('GET_INVOICES'); // Fetch the updated list of invoices after uploading
-  }};
 
   const saveDraft = ()=> form.invoiceDraft = true
   const publishInvoice = ()=>  form.invoicePending = true

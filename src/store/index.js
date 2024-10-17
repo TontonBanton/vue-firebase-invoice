@@ -56,6 +56,8 @@ export default createStore({
     },
 
     async UPDATE_INVOICE({ commit, dispatch }, { docId, routeId }) {
+      alert(docId, routeId)
+      alert('entering action')
       commit("DELETE_INVOICE", docId);
       await dispatch("GET_INVOICES");
       commit("TOGGLE_INVOICE");
@@ -71,7 +73,6 @@ export default createStore({
     },
 
     async UPDATE_STATUS_TO_PAID({commit}, docId) {
-      alert('entering action')
       const invoiceRef = doc(db, "invoices", docId);          //UPDATE BACKEND
       await updateDoc(invoiceRef, {
         invoicePaid: true,
