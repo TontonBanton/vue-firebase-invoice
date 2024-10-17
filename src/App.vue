@@ -3,7 +3,7 @@ import '@/styles/AppStyle.scss'
 import { onMounted, onUnmounted } from 'vue'
 import Navigation from '@/components/Navigation.vue'
 import InvoiceModal from '@/components/InvoiceModal.vue';
-import Modal from './components/Modal.vue';
+import CloseModal from './components/CloseModal.vue';
 import { useScreenCheck } from '@/composables/useScreenCheck'
 
 import { computed } from 'vue';
@@ -37,7 +37,7 @@ onUnmounted(() => {
     <div v-if="!isMobile" class="app flex flex-column">
       <Navigation/>
       <div class="app-content flex flex-column">
-        <Modal v-if="modalActive"/>
+        <CloseModal v-if="modalActive"/>
         <transition name="invoice"> <InvoiceModal v-if="invoiceModal" />  </transition>
         <router-view />
       </div>

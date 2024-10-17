@@ -5,11 +5,7 @@ import InvoiceDetails from '@/components/InvoiceViewComp/InvoiceDetails.vue'
 import InvoiceItems from '@/components/InvoiceViewComp/InvoiceItems.vue';
 import { ref, computed, onMounted } from 'vue';
 
-import { useStoreActions } from '@/composables/useStoreActions';
-const { updateStatusPaid, updateStatusPending } = useStoreActions()
-
-import { useRouter, useRoute } from 'vue-router';
-const router = useRouter()
+import { useRoute } from 'vue-router';
 const route = useRoute()
 const routeInvId =  route.params.invoiceId
 
@@ -29,16 +25,6 @@ const getCurrentInvoice = ()=> {
   currentInvoice.value = currentInvoiceArray.value[0] || null;
 }
 
-const deleteInvoice = async (docId) => {
-  await store.dispatch('DELETE_INVOICE', docId);
-  router.push({ name: "Home" })
-  store.dispatch('GET_INVOICES');  //Fetch the updated list of invoices after uploading
-}
-
-const toggleEditInvoice = ()=> {
-  store.commit('TOGGLE_EDIT_INVOICE');
-  store.commit('TOGGLE_INVOICE');
-}
 </script>
 
 <template>
@@ -46,11 +32,7 @@ const toggleEditInvoice = ()=> {
     <router-link to="/" style="color:white;">
       <img src="@/assets/left-arrow.png" alt="" style="width: 15px; height: 15px" /> Back to List
     </router-link>
-
-    <InvoiceHeader :currentInvoice="currentInvoice"
-      @edit="toggleEditInvoice" @delete="deleteInvoice"
-      @markPaid="updateStatusPaid" @markPending="updateStatusPending"
-    />
+    <InvoiceHeader :currentInvoice="currentInvoice"/>
 
     <div class="invoice-details flex flex-column">
       <InvoiceDetails :currentInvoice="currentInvoice" />

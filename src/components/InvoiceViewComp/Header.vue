@@ -1,13 +1,25 @@
 <script setup>
-const props = defineProps({
-  currentInvoice: Object
-});
+  import store from '@/store';
+  import { useRouter } from 'vue-router';
+  import { useStoreActions } from '@/composables/useStoreActions';
 
-const emit = defineEmits(['edit', 'delete', 'markPaid', 'markPending']);
-  const onEdit = () => emit('edit')
-  const onDelete = (id) => emit('delete', id)
-  const onMarkPaid = (id) => emit('markPaid', id)
-  const onMarkPending = (id) => emit('markPending', id)
+  const router = useRouter()
+  const { updateStatusPaid, updateStatusPending } = useStoreActions()
+
+  const props = defineProps({
+    currentInvoice: Object
+  });
+
+  const toggleEditInvoice = ()=> {
+    store.commit('TOGGLE_EDIT_INVOICE');
+    store.commit('TOGGLE_INVOICE');
+  }
+
+  const deleteInvoice = async (docId) => {
+    await store.dispatch('DELETE_INVOICE', docId);
+    router.push({ name: "Home" })
+    store.dispatch('GET_INVOICES');
+  }
 </script>
 
 <template>
@@ -27,10 +39,14 @@ const emit = defineEmits(['edit', 'delete', 'markPaid', 'markPending']);
     </div>
 
     <div class="right flex">
-      <button @click="onEdit" class="orange">Edit</button>
-      <button @click="onDelete(currentInvoice.docId)" class="orange">Delete</button>
-      <button v-if="currentInvoice.invoicePending" @click="onMarkPaid(currentInvoice.docId)" class="orange">Mark as Paid</button>
-      <button v-if="currentInvoice.invoiceDraft || currentInvoice.invoicePaid" @click="onMarkPending(currentInvoice.docId)" class="orange">Mark as Pending</button>
+      <button @click="toggleEditInvoice" class="orange">Edit</button>
+      <button @click="deleteInvoice(currentInvoice.docId)" class="orange">Delete</button>
+      <button v-if="currentInvoice.invoicePending"
+        @click="updateStatusPaid(currentInvoice.docId)" class="orange">Mark as Paid
+      </button>
+      <button v-if="currentInvoice.invoiceDraft || currentInvoice.invoicePaid"
+        @click="updateStatusPending(currentInvoice.docId)" class="orange">Mark as Pending
+      </button>
     </div>
   </div>
 </template>

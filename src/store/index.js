@@ -1,7 +1,7 @@
 import { createStore } from 'vuex';
 import db from '@/firebase/firebaseinit';
 import { collection, doc ,getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
-import { firestoreInvoiceToObject } from '@/composables/useInvoiceData'
+import { firestoreInvoiceToObject } from './TransformDoc';
 import { UPDATE_STATUS_TO_PAID, UPDATE_STATUS_TO_PENDING } from './statusMutations';
 
 export default createStore({
@@ -9,6 +9,7 @@ export default createStore({
     invoiceData: [],
     currentInvoiceArray: [],
     invoicesLoaded: null,
+
     invoiceModal: null,
     modalActive: null,
     editInvoice: null,
@@ -17,11 +18,25 @@ export default createStore({
   mutations: {
     UPDATE_STATUS_TO_PAID,
     UPDATE_STATUS_TO_PENDING,
-
     INVOICES_LOADED(state) {state.invoicesLoaded = true},
-    TOGGLE_INVOICE(state) { state.invoiceModal = !state.invoiceModal;},
-    TOGGLE_MODAL(state) { state.modalActive = !state.modalActive;},
-    TOGGLE_EDIT_INVOICE(state) { state.editInvoice = !state.editInvoice;},
+
+    TOGGLE_INVOICE(state) {
+      alert(`Invoice Modal toggled: ${state.invoiceModal}`);
+      state.invoiceModal = !state.invoiceModal;
+      alert(`Invoice Modal toggled: ${state.invoiceModal}`);
+    },
+
+    TOGGLE_MODAL(state) {
+      alert(`Modal Active toggled: ${state.modalActive}`);
+      state.modalActive = !state.modalActive;
+      alert(`Modal Active toggled: ${state.modalActive}`);
+    },
+
+    TOGGLE_EDIT_INVOICE(state) {
+      alert(`Edit Invoice toggled: ${state.editInvoice}`);
+      state.editInvoice = !state.editInvoice;
+      alert(`Edit Invoice toggled: ${state.editInvoice}`);
+    },
 
     //Data Mutations
     SET_INVOICE_DATA(state, data){
@@ -56,8 +71,6 @@ export default createStore({
     },
 
     async UPDATE_INVOICE({ commit, dispatch }, { docId, routeId }) {
-      alert(docId, routeId)
-      alert('entering action')
       commit("DELETE_INVOICE", docId);
       await dispatch("GET_INVOICES");
       commit("TOGGLE_INVOICE");

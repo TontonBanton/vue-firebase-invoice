@@ -5,8 +5,9 @@ import { ref, computed } from 'vue';
 
 import { useStore } from 'vuex';
 const store = useStore();
-const invoiceData= computed(() => store.state.invoiceData);
 const newInvoice = () => { store.commit('TOGGLE_INVOICE') };
+
+const invoiceData= computed(() => store.state.invoiceData);
 
 const filterShow = ref(null)
 const toggleFilterMenu = ()=> filterShow.value = !filterShow.value
