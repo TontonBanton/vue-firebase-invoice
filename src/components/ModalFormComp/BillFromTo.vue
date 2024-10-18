@@ -7,7 +7,6 @@ const props = defineProps({
 </script>
 
 <template>
-
   <div class="bill-from flex flex-column">
   <h4 class>Bill From</h4>
   <div class="input flex flex-column">

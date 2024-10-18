@@ -4,11 +4,11 @@ import { onMounted, onUnmounted } from 'vue'
 import Navigation from '@/components/Navigation.vue'
 import InvoiceModal from '@/components/InvoiceModal.vue';
 import CloseModal from './components/CloseModal.vue';
-import { useScreenCheck } from '@/composables/useScreenCheck'
+import { useUtilities } from '@/composables/useUtilities'
 
 import { computed } from 'vue';
 import { useStore } from 'vuex';
-const { isMobile, checkScreen } = useScreenCheck(750);
+const { isMobile, checkScreen } = useUtilities();
 
 const store = useStore();
 const invoiceModal = computed(() => store.state.invoiceModal);
