@@ -1,11 +1,19 @@
 <script setup>
-import '@/styles/components/InvoiceModalStyle.scss'
-import { useInvoiceForm } from '@/composables/useInvoiceForm'
-const { addNewInvoiceItem, deleteInvoiceItem } = useInvoiceForm();
+  import '@/styles/components/InvoiceModalStyle.scss'
+  import { uid } from 'uid';
 
-const props = defineProps({
-  form: Object
-})
+  const props = defineProps({
+    form: Object
+  })
+
+  const addNewInvoiceItem = () => {
+    props.form.invoiceItemList.push({ id: uid(), itemName: '', qty: 0, price: 0 });
+  };
+
+  const deleteInvoiceItem = (itemId) => {
+    props.form.invoiceItemList = form.invoiceItemList.filter((item) => item.id !== itemId);
+  };
+
 </script>
 
 <template>
@@ -54,3 +62,4 @@ const props = defineProps({
     </div>
   </div>
 </template>
+

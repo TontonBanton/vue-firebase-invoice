@@ -1,5 +1,6 @@
 <script setup>
-import { useFormatCurrency } from '@/composables/useFormatCurrency';
+import { useUtilities } from '@/composables/useUtilities'
+const { formatCurrency} = useUtilities();
 
 const props = defineProps({
   currentItems: Object
@@ -19,13 +20,13 @@ const props = defineProps({
       <div v-for="(item, index) in currentItems.invoiceItemList" :key="index" class="item flex">
         <p>{{ item.itemName }}</p>
         <p>{{ item.qty }}</p>
-        <p>{{ useFormatCurrency(item.price) }}</p>
-        <p>{{ useFormatCurrency(item.total) }}</p>
+        <p>{{ formatCurrency(item.price) }}</p>
+        <p>{{ formatCurrency(item.total) }}</p>
       </div>
     </div>
     <div class="total flex orange">
       <p>Amount Due</p>
-      <p>{{ useFormatCurrency(currentItems.invoiceTotal) }}</p>
+      <p>{{ formatCurrency(currentItems.invoiceTotal) }}</p>
     </div>
   </div>
 </template>

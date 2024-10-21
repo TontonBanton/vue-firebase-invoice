@@ -1,9 +1,8 @@
 <script setup>
-import '@/styles/components/InvoiceModalStyle.scss'
-
-const props = defineProps({
-  form: Object
-})
+  import '@/styles/components/InvoiceModalStyle.scss'
+  const props = defineProps({
+    form: Object
+  })
 </script>
 
 <template>

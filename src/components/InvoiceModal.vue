@@ -38,10 +38,10 @@ onMounted(() => {
       store.dispatch('UPDATE_INVOICE', { docId: form.docId, routeId: route.params.invoiceId });
       loading.value = false;
     } else {
-      uploadInvoice(form); // Create new invoice
+      uploadInvoice(form);
       loading.value = false;
       store.commit('TOGGLE_INVOICE');
-      store.dispatch('GET_INVOICES'); // Fetch the updated list of invoices after uploading
+      store.dispatch('GET_INVOICES');
     }
   };
 
@@ -62,7 +62,6 @@ onMounted(() => {
 
   const draftInvoice = ()=> form.invoiceDraft = true
   const pendInvoice = ()=>  form.invoicePending = true
-
   const closeInvoice = ()=> {
     store.commit('TOGGLE_INVOICE');
     if (store.state.editInvoice === true ) {
@@ -73,6 +72,7 @@ onMounted(() => {
 
 <template>
 <div @click="checkClick" class="invoice-wrap flex flex-column" ref="invoiceWrap">
+
   <form @submit.prevent="submitForm" class="invoice-content">
     <Loading v-show="loading"/>
     <h1 v-if="!store.state.editInvoice">New Invoice</h1>
@@ -90,7 +90,7 @@ onMounted(() => {
           <button v-if="store.state.editInvoice" type="submit" class="orange">Update Invoice</button>
         </div>
       </div>
-
   </form>
+
 </div>
 </template>

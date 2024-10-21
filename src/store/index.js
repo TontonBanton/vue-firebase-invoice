@@ -1,7 +1,7 @@
 import { createStore } from 'vuex';
 import db from '@/firebase/firebaseinit';
 import { collection, doc ,getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
-import { firestoreInvoiceToObject } from './TransformDoc';
+import { firestoreInvoiceToObject } from './transformDoc'
 import { UPDATE_STATUS_TO_PAID, UPDATE_STATUS_TO_PENDING } from './statusMutations';
 
 export default createStore({
@@ -21,21 +21,21 @@ export default createStore({
     INVOICES_LOADED(state) {state.invoicesLoaded = true},
 
     TOGGLE_INVOICE(state) {
-      alert(`Invoice Modal toggled: ${state.invoiceModal}`);
+      //alert(`Invoice Modal toggled: ${state.invoiceModal}`);
       state.invoiceModal = !state.invoiceModal;
-      alert(`Invoice Modal toggled: ${state.invoiceModal}`);
+      //alert(`Invoice Modal toggled: ${state.invoiceModal}`);
     },
 
     TOGGLE_MODAL(state) {
-      alert(`Modal Active toggled: ${state.modalActive}`);
+      //alert(`Modal Active toggled: ${state.modalActive}`);
       state.modalActive = !state.modalActive;
-      alert(`Modal Active toggled: ${state.modalActive}`);
+      //alert(`Modal Active toggled: ${state.modalActive}`);
     },
 
     TOGGLE_EDIT_INVOICE(state) {
-      alert(`Edit Invoice toggled: ${state.editInvoice}`);
+      //alert(`Edit Invoice toggled: ${state.editInvoice}`);
       state.editInvoice = !state.editInvoice;
-      alert(`Edit Invoice toggled: ${state.editInvoice}`);
+      //alert(`Edit Invoice toggled: ${state.editInvoice}`);
     },
 
     //Data Mutations
