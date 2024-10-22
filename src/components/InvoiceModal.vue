@@ -9,6 +9,7 @@ import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 const route = useRoute()
 const store = useStore();
+const routeInvId =  route.params.invoiceId
 const editInvoice = computed(() => store.state.editInvoice);
 const currentInvoiceArray = computed(() => store.state.currentInvoiceArray);
 
@@ -36,13 +37,14 @@ onMounted(() => {
     if (editInvoice.value) {
       updateInvoice(form);
       store.dispatch('UPDATE_INVOICE', { docId: form.docId, routeId: route.params.invoiceId });
-      loading.value = false;
+      store.commit('TOGGLE_EDIT_INVOICE');
+      store.commit('SET_CURRENT_INVOICE', routeInvId)
     } else {
       uploadInvoice(form);
-      loading.value = false;
       store.commit('TOGGLE_INVOICE');
       store.dispatch('GET_INVOICES');
     }
+    loading.value = false;
   };
 
   watch(() => form.paymentTerms, (termsSelect) => {

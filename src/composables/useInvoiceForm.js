@@ -1,5 +1,4 @@
 import { reactive } from 'vue';
-import { uid } from 'uid';
 
 export function useInvoiceForm() {
   const form = reactive({
@@ -39,10 +38,6 @@ export function useInvoiceForm() {
     });
   };
 
-  return {
-    form,
-    populateForm,
-    calculateInvoiceTotal,
-  };
+  return { form, populateForm, calculateInvoiceTotal };
 }
 

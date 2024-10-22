@@ -3,7 +3,7 @@ import '@/styles/InvoiceViewStyle.scss'
 import InvoiceHeader from '@/components/InvoiceViewComp/Header.vue'
 import InvoiceDetails from '@/components/InvoiceViewComp/InvoiceDetails.vue'
 import InvoiceItems from '@/components/InvoiceViewComp/InvoiceItems.vue';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 
 import { useRoute } from 'vue-router';
 const route = useRoute()
@@ -17,13 +17,16 @@ const currentInvoice = ref(null); // Define currentInvoice as a ref
 
 onMounted(()=> {
   getCurrentInvoice()
-  console.log(currentInvoice.value)
 })
 
 const getCurrentInvoice = ()=> {
   store.commit('SET_CURRENT_INVOICE', routeInvId)
   currentInvoice.value = currentInvoiceArray.value[0] || null;
 }
+
+watch(currentInvoiceArray, (newInvoiceArray) => {
+  currentInvoice.value = newInvoiceArray[0] || null;
+});
 
 </script>
 

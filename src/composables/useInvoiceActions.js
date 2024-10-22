@@ -23,31 +23,18 @@ export function useInvoiceActions() {
 
 const updateInvoice = async (form) => {
   checkItemList(form.invoiceItemList.length)
-  const invoiceRef = doc(db, 'invoices', form.docId); // Reference to the invoice document
+  const invoiceRef = doc(db, 'invoices', form.docId);
   try {
     await updateDoc(invoiceRef, {
-      billerStreetAddress: form.billerStreetAddress,
-      billerCity: form.billerCity,
-      billerZipCode: form.billerZipCode,
-      billerCountry: form.billerCountry,
-      clientName: form.clientName,
-      clientEmail: form.clientEmail,
-      clientStreetAddress: form.clientStreetAddress,
-      clientCity: form.clientCity,
-      clientZipCode: form.clientZipCode,
-      clientCountry: form.clientCountry,
-      paymentTerms: form.paymentTerms,
-      paymentDueDate: form.paymentDueDate,
-      paymentDueDateUnix: form.paymentDueDateUnix,
-      productDescription: form.productDescription,
+      ...form,
       invoiceItemList: form.invoiceItemList,
-      invoiceTotal: form.invoiceTotal,
+      invoiceTotal: form.invoiceTotal
     })
     console.log('Invoice successfully updated!');
   } catch (error) {
     console.error('Error updating invoice: ', error.message || error);
   }
-  window.location.reload()                  //alert('temporary reload fetch the db from fbase')
+  //window.location.reload()                  //alert('temporary reload fetch the db from fbase')
 }
 
 const checkItemList = (listItems) => {
